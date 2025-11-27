@@ -9,6 +9,7 @@ import { graphql } from '../graphql'
 import { execute } from '../graphql/execute'
 
 // GraphQL query for a single event with all details
+// brianna
 const EventDetailQuery = graphql(`
   query EventDetail($id: ID!) {
     event(id: $id) {
@@ -91,6 +92,40 @@ function EventDetailPage() {
     }
   }
 
+const handleRegister = ()=>{
+  console.log("register")
+}
+const handleCancel = ()=>{
+  console.log("cancel")
+}
+
+const currentUserIsRegistered = false
+
+const registrationIsLoading = false
+const cancellationIsLoading = false
+
+const registrationError = true
+const cancellationError = true
+
+const loadingMessage = "Loading..."
+
+const registrationButton = registrationIsLoading ? loadingMessage : <ActionButton 
+              $size="small" 
+              $variant="danger"
+              onClick={handleRegister}
+              disabled={event.availableSpots && event.availableSpots < 1 || currentUserIsRegistered }
+            >
+              Register
+            </ActionButton>
+
+const cancellationButton = cancellationIsLoading? loadingMessage:<ActionButton 
+              $size="small" 
+              $variant="danger"
+              onClick={handleCancel}
+            >
+              Register
+            </ActionButton>
+
   return (
     <PageContainer>
       {/* Header */}
@@ -102,11 +137,6 @@ function EventDetailPage() {
           <StatusBadge $status={event.status as 'scheduled' | 'completed' | 'cancelled' || 'scheduled'}>
             {getStatusText(event.status || 'scheduled')}
           </StatusBadge>
-          {event.registrationRequired && (
-            <StatusBadge $status="warning">
-              Registration Required
-            </StatusBadge>
-          )}
           {event.allDay && (
             <StatusBadge $status="info">
               All Day Event
@@ -249,7 +279,21 @@ function EventDetailPage() {
                   No capacity limit
                 </Typography>
               )}
-
+              <Spacer $size="sm" />
+{event.registrationRequired && (
+            <>
+            <StatusBadge $status="warning">
+              Registration Required
+            </StatusBadge>
+            <Spacer $size="sm" />
+            Your registration status is: {currentUserIsRegistered ? 'Registered' : 'Not registered'}
+            <Spacer $size="sm" />
+            {currentUserIsRegistered ? cancellationButton : registrationButton }
+            <Spacer $size="sm" />
+            {registrationError || cancellationError && "Error! try again later"}
+            {/* brianna success message */}
+            </>
+          )}
               {event.registrationDeadline && (
                 <>
                   <Spacer $size="md" />
