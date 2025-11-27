@@ -33,6 +33,11 @@ const EventDetailQuery = graphql(`
   }
 `)
 
+const CancelEventRegistrationMutation = graphql(`
+  mutation cancelEventRegistration($id: ID!) { 
+  cancelEventRegistration(id: $id)
+}`)
+
 function EventDetailPage() {
   const { eventId } = Route.useParams()
   
