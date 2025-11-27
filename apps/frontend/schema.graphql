@@ -121,6 +121,7 @@ type Location {
 }
 
 type Mutation {
+  cancelEventRegistration(id: ID!): Boolean
   ping: String
 }
 

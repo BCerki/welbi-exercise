@@ -117,6 +117,7 @@ type Location {
 
 type Mutation {
   ping: String
+  cancelEventRegistration(id: ID!): Boolean
 }
 
 enum ParticipantStatus {

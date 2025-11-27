@@ -141,7 +141,13 @@ export type Location = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  cancelEventRegistration?: Maybe<Scalars['Boolean']['output']>;
   ping?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type MutationCancelEventRegistrationArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export enum ParticipantStatus {
@@ -278,6 +284,13 @@ export type EventDetailQueryVariables = Exact<{
 
 export type EventDetailQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, duration?: number | null, allDay?: boolean | null, maxParticipants?: number | null, currentParticipants?: number | null, availableSpots?: number | null, registrationRequired?: boolean | null, registrationDeadline?: any | null, status?: string | null, notes?: string | null, createdAt?: any | null, updatedAt?: any | null } | null };
 
+export type CancelEventRegistrationMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type CancelEventRegistrationMutation = { __typename?: 'Mutation', cancelEventRegistration?: boolean | null };
+
 export type HealthQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -338,6 +351,11 @@ export const EventDetailDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<EventDetailQuery, EventDetailQueryVariables>;
+export const CancelEventRegistrationDocument = new TypedDocumentString(`
+    mutation cancelEventRegistration($id: ID!) {
+  cancelEventRegistration(id: $id)
+}
+    `) as unknown as TypedDocumentString<CancelEventRegistrationMutation, CancelEventRegistrationMutationVariables>;
 export const HealthDocument = new TypedDocumentString(`
     query Health {
   health {
