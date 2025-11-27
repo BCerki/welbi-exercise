@@ -39,6 +39,10 @@ input EventFiltersInput {
   wellnessDimensionIds: [String!]
 }
 
+type EventRegistrationResult {
+  success: String
+}
+
 type EventSeries {
   createdAt: DateTime
   description: String
@@ -123,6 +127,7 @@ type Location {
 type Mutation {
   cancelEventRegistration(id: ID!): Boolean
   ping: String
+  registerForEvent(eventId: ID!): EventRegistrationResult!
 }
 
 enum ParticipantStatus {

@@ -115,9 +115,14 @@ type Location {
   updatedAt: DateTime
 }
 
+type EventRegistrationResult{
+  success: String
+}
+
 type Mutation {
   ping: String
   cancelEventRegistration(id: ID!): Boolean
+  registerForEvent(eventId: ID!): EventRegistrationResult!
 }
 
 enum ParticipantStatus {

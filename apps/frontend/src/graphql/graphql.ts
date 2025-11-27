@@ -52,6 +52,11 @@ export type EventFiltersInput = {
   wellnessDimensionIds?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
+export type EventRegistrationResult = {
+  __typename?: 'EventRegistrationResult';
+  success?: Maybe<Scalars['String']['output']>;
+};
+
 export type EventSeries = {
   __typename?: 'EventSeries';
   createdAt?: Maybe<Scalars['DateTime']['output']>;
@@ -143,11 +148,17 @@ export type Mutation = {
   __typename?: 'Mutation';
   cancelEventRegistration?: Maybe<Scalars['Boolean']['output']>;
   ping?: Maybe<Scalars['String']['output']>;
+  registerForEvent: EventRegistrationResult;
 };
 
 
 export type MutationCancelEventRegistrationArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationRegisterForEventArgs = {
+  eventId: Scalars['ID']['input'];
 };
 
 export enum ParticipantStatus {
