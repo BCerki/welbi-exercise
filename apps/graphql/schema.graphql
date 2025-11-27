@@ -116,7 +116,8 @@ type Location {
 }
 
 type EventRegistrationResult{
-  success: String
+  userId: ID
+  eventId: ID
 }
 
 type Mutation {

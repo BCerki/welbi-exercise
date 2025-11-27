@@ -13,7 +13,7 @@ type SearchParams = {
 }
 
 // Type-safe GraphQL queries using generated client
-const HealthQuery = graphql(`
+export const HealthQuery = graphql(`
   query Health {
     health {
       status
@@ -41,6 +41,26 @@ const EventsQuery = graphql(`
     }
   }
 `)
+// const EventsQuery = graphql(`
+//   query Events($limit: Int) {
+//     events(limit: $limit) {
+//       id
+//       title
+//       description
+//       startTime
+//       endTime
+//       currentParticipants
+//       maxParticipants
+//       registrationRequired
+//       status
+//     }
+//     eventParticipants(eventId: $id) {
+//       id
+//       eventId
+//       userId
+//     }
+//   }
+// `)
 
 const CalendarEventsQuery = graphql(`
   query CalendarEvents($limit: Int) {
@@ -349,6 +369,9 @@ function HomePage() {
                       </Typography>
                       <Typography $variant="body2">
                         Status: {event.status}
+                      </Typography>
+                      <Typography $variant="body2">
+                        {healthData?.health?.currentUser && `Your registration status is: `} 
                       </Typography>
                       {event.currentParticipants !== null && (
                         <Typography $variant="body2">

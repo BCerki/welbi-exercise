@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { 
   Card, Box, Typography, CardContent, Grid, GridItem,
   StatusBadge, InfoBox, ProgressBar, ProgressBarFill, ActionButton, 
@@ -38,12 +38,38 @@ const CancelEventRegistrationMutation = graphql(`
   cancelEventRegistration(id: $id)
 }`)
 
+const RegisterForEventMutation = graphql(`
+  mutation registerForEvent($eventId: ID!) { 
+  registerForEvent(eventId: $eventId) {
+    userId
+    eventId
+  }
+}`)
+
 function EventDetailPage() {
   const { eventId } = Route.useParams()
+
   
   const { data: eventData, isLoading, error } = useQuery({
     queryKey: ['event', eventId],
     queryFn: () => execute(EventDetailQuery, { id: eventId }),
+  })
+
+
+  
+  // isLoading should be there: https://tanstack.com/query/v4/docs/framework/react/reference/useMutation
+  // const { data: bri, isLoading: cancellationIsLoading, error: cancellationError, isSuccess: cancellationSuccess } 
+  
+  
+  const cancelMutation = useMutation({
+    mutationKey: ['event', eventId],
+    mutationFn: () => execute(CancelEventRegistrationMutation, { id: eventId }),
+    onMutate: ()=> console.log("optimistic update"),
+    // onSuccess
+    // handle concurrent updates
+    scope: {
+    id: 'cancel',
+  },
   })
 
   if (isLoading) {
@@ -101,16 +127,14 @@ const handleRegister = ()=>{
   console.log("register")
 }
 const handleCancel = ()=>{
-  console.log("cancel")
+  cancelMutation.mutate()
 }
 
-const currentUserIsRegistered = false
+const currentUserIsRegistered = true
 
 const registrationIsLoading = false
-const cancellationIsLoading = false
 
 const registrationError = true
-const cancellationError = true
 
 const loadingMessage = "Loading..."
 
@@ -123,12 +147,12 @@ const registrationButton = registrationIsLoading ? loadingMessage : <ActionButto
               Register
             </ActionButton>
 
-const cancellationButton = cancellationIsLoading? loadingMessage:<ActionButton 
+const cancellationButton = cancelMutation.isLoading? loadingMessage:<ActionButton 
               $size="small" 
               $variant="danger"
               onClick={handleCancel}
             >
-              Register
+              Cancel Registration
             </ActionButton>
 
   return (
@@ -295,7 +319,7 @@ const cancellationButton = cancellationIsLoading? loadingMessage:<ActionButton
             <Spacer $size="sm" />
             {currentUserIsRegistered ? cancellationButton : registrationButton }
             <Spacer $size="sm" />
-            {registrationError || cancellationError && "Error! try again later"}
+            {registrationError || cancelMutation.error && "Error! try again later"}
             {/* brianna success message */}
             </>
           )}

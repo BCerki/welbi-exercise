@@ -33,34 +33,34 @@ Implement a complete event registration system that allows users to:
    - `cancelEventRegistration(eventId: ID!): EventRegistrationResult!`
 
 2. **Business Logic**
-   - Prevent registration when event is at capacity
-   - Prevent duplicate registrations by the same user
+   - FE yes, BE if more time | Prevent registration when event is at capacity
+   - FE yes, BE if more time | Prevent duplicate registrations by the same user
    - Update `currentParticipants` count when registrations change
    - Handle concurrent registration attempts properly
    - Add proper validation and error messages
 
 3. **Authorization**
    - Use the existing CASL permission system
-   - Only authenticated users can register for events
-   - Users can only cancel their own registrations
+   - FE Only authenticated users can register for events
+   - FE Users can only cancel their own registrations
    - Add appropriate permission checks
 
 ### Frontend (React) Requirements
 
 1. **Event Detail Page Enhancement**
-   - Add registration button to `/event/$eventId` page
-   - Show current registration status (registered/not registered)
-   - Display available spots vs. total capacity
-   - Handle different states: loading, success, error
+   - YES Add registration button to `/event/$eventId` page 
+   - YES Show current registration status (registered/not registered) 
+   - ALREADY DONE Display available spots vs. total capacity 
+   - YES Handle different states: loading, success, error
 
 2. **User Experience**
-   - Show loading states during registration/cancellation
+   - YES Show loading states during registration/cancellation
    - Display success/error messages clearly
    - Use optimistic updates with rollback on failure
-   - Disable registration button when appropriate (full capacity, already registered)
+   - YES Disable registration button when appropriate (full capacity, already registered)
 
 3. **Events List Integration**
-   - Show registration status indicators on the events list
+   - YES Show registration status indicators on the events list
    - Update the UI immediately after registration changes
 
 ### Technical Requirements

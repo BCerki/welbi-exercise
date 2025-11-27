@@ -54,7 +54,8 @@ export type EventFiltersInput = {
 
 export type EventRegistrationResult = {
   __typename?: 'EventRegistrationResult';
-  success?: Maybe<Scalars['String']['output']>;
+  eventId?: Maybe<Scalars['ID']['output']>;
+  userId?: Maybe<Scalars['ID']['output']>;
 };
 
 export type EventSeries = {
@@ -302,6 +303,13 @@ export type CancelEventRegistrationMutationVariables = Exact<{
 
 export type CancelEventRegistrationMutation = { __typename?: 'Mutation', cancelEventRegistration?: boolean | null };
 
+export type RegisterForEventMutationVariables = Exact<{
+  eventId: Scalars['ID']['input'];
+}>;
+
+
+export type RegisterForEventMutation = { __typename?: 'Mutation', registerForEvent: { __typename?: 'EventRegistrationResult', userId?: string | null, eventId?: string | null } };
+
 export type HealthQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -367,6 +375,14 @@ export const CancelEventRegistrationDocument = new TypedDocumentString(`
   cancelEventRegistration(id: $id)
 }
     `) as unknown as TypedDocumentString<CancelEventRegistrationMutation, CancelEventRegistrationMutationVariables>;
+export const RegisterForEventDocument = new TypedDocumentString(`
+    mutation registerForEvent($eventId: ID!) {
+  registerForEvent(eventId: $eventId) {
+    userId
+    eventId
+  }
+}
+    `) as unknown as TypedDocumentString<RegisterForEventMutation, RegisterForEventMutationVariables>;
 export const HealthDocument = new TypedDocumentString(`
     query Health {
   health {

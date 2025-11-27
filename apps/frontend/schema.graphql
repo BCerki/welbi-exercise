@@ -40,7 +40,8 @@ input EventFiltersInput {
 }
 
 type EventRegistrationResult {
-  success: String
+  eventId: ID
+  userId: ID
 }
 
 type EventSeries {

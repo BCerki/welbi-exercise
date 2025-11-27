@@ -52,6 +52,22 @@ async function startServer() {
     fs.writeFileSync('schema.graphql', createSchemaSDL());
   }
 
+//  Prevent registration when event is at capacity - FE yes, BE if more time
+//    - Prevent duplicate registrations by the same user
+  //  - Only authenticated users can register for events
+  //  - Users can only cancel their own registrations
+  //  - Add appropriate permission checks
+//   const resolvers = {
+//   Query: {
+//     numberSix() {
+//       return 6;
+//     },
+//     numberSeven() {
+//       return 7;
+//     },
+//   },
+// };
+
   // Create Apollo Server
   const server = new ApolloServer({
     schema,
@@ -59,6 +75,7 @@ async function startServer() {
     introspection: isDev,
     debug: isDev,
     plugins: [],
+    // resolvers here
   });
 
   await server.start();
