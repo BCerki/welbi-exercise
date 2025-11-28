@@ -15,16 +15,14 @@ import * as types from './graphql';
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n  query EventDetail($id: ID!) {\n    event(id: $id) {\n      id\n      title\n      description\n      startTime\n      endTime\n      duration\n      allDay\n      maxParticipants\n      currentParticipants\n      availableSpots\n      registrationRequired\n      registrationDeadline\n      status\n      notes\n      createdAt\n      updatedAt\n    }\n  }\n": typeof types.EventDetailDocument,
-    "\n  mutation cancelEventRegistration($id: ID!) { \n  cancelEventRegistration(id: $id)\n}": typeof types.CancelEventRegistrationDocument,
+    "\n  query EventDetail($id: ID!) {\n    event(id: $id) {\n      id\n      title\n      description\n      startTime\n      endTime\n      duration\n      allDay\n      maxParticipants\n      currentParticipants\n      availableSpots\n      registrationRequired\n      registrationDeadline\n      status\n      notes\n      currentUserIsRegistered\n      createdAt\n      updatedAt\n    }\n  }\n": typeof types.EventDetailDocument,
     "\n  mutation registerForEvent($eventId: ID!) { \n  registerForEvent(eventId: $eventId) {\n    eventId\n  }\n}": typeof types.RegisterForEventDocument,
     "\n  query Health {\n    health {\n      status\n      currentUser {\n        id\n        name\n        email\n      }\n    }\n  }\n": typeof types.HealthDocument,
     "\n  query Events($limit: Int) {\n    events(limit: $limit) {\n      id\n      title\n      description\n      startTime\n      endTime\n      currentParticipants\n      maxParticipants\n      registrationRequired\n      status\n    }\n  }\n": typeof types.EventsDocument,
     "\n  query CalendarEvents($limit: Int) {\n    events(limit: $limit) {\n      id\n      title\n      startTime\n      endTime\n      status\n      description\n      currentParticipants\n      maxParticipants\n    }\n  }\n": typeof types.CalendarEventsDocument,
 };
 const documents: Documents = {
-    "\n  query EventDetail($id: ID!) {\n    event(id: $id) {\n      id\n      title\n      description\n      startTime\n      endTime\n      duration\n      allDay\n      maxParticipants\n      currentParticipants\n      availableSpots\n      registrationRequired\n      registrationDeadline\n      status\n      notes\n      createdAt\n      updatedAt\n    }\n  }\n": types.EventDetailDocument,
-    "\n  mutation cancelEventRegistration($id: ID!) { \n  cancelEventRegistration(id: $id)\n}": types.CancelEventRegistrationDocument,
+    "\n  query EventDetail($id: ID!) {\n    event(id: $id) {\n      id\n      title\n      description\n      startTime\n      endTime\n      duration\n      allDay\n      maxParticipants\n      currentParticipants\n      availableSpots\n      registrationRequired\n      registrationDeadline\n      status\n      notes\n      currentUserIsRegistered\n      createdAt\n      updatedAt\n    }\n  }\n": types.EventDetailDocument,
     "\n  mutation registerForEvent($eventId: ID!) { \n  registerForEvent(eventId: $eventId) {\n    eventId\n  }\n}": types.RegisterForEventDocument,
     "\n  query Health {\n    health {\n      status\n      currentUser {\n        id\n        name\n        email\n      }\n    }\n  }\n": types.HealthDocument,
     "\n  query Events($limit: Int) {\n    events(limit: $limit) {\n      id\n      title\n      description\n      startTime\n      endTime\n      currentParticipants\n      maxParticipants\n      registrationRequired\n      status\n    }\n  }\n": types.EventsDocument,
@@ -34,11 +32,7 @@ const documents: Documents = {
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query EventDetail($id: ID!) {\n    event(id: $id) {\n      id\n      title\n      description\n      startTime\n      endTime\n      duration\n      allDay\n      maxParticipants\n      currentParticipants\n      availableSpots\n      registrationRequired\n      registrationDeadline\n      status\n      notes\n      createdAt\n      updatedAt\n    }\n  }\n"): typeof import('./graphql').EventDetailDocument;
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  mutation cancelEventRegistration($id: ID!) { \n  cancelEventRegistration(id: $id)\n}"): typeof import('./graphql').CancelEventRegistrationDocument;
+export function graphql(source: "\n  query EventDetail($id: ID!) {\n    event(id: $id) {\n      id\n      title\n      description\n      startTime\n      endTime\n      duration\n      allDay\n      maxParticipants\n      currentParticipants\n      availableSpots\n      registrationRequired\n      registrationDeadline\n      status\n      notes\n      currentUserIsRegistered\n      createdAt\n      updatedAt\n    }\n  }\n"): typeof import('./graphql').EventDetailDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

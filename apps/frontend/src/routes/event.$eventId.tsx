@@ -27,16 +27,17 @@ const EventDetailQuery = graphql(`
       registrationDeadline
       status
       notes
+      currentUserIsRegistered
       createdAt
       updatedAt
     }
   }
 `)
 
-const CancelEventRegistrationMutation = graphql(`
-  mutation cancelEventRegistration($id: ID!) { 
-  cancelEventRegistration(id: $id)
-}`)
+// const CancelEventRegistrationMutation = graphql(`
+//   mutation cancelEventRegistration($id: ID!) { 
+//   cancelEventRegistration(id: $id)
+// }`)
 
 const RegisterForEventMutation = graphql(`
   mutation registerForEvent($eventId: ID!) { 
@@ -47,6 +48,7 @@ const RegisterForEventMutation = graphql(`
 
 function EventDetailPage() {
   const { eventId } = Route.useParams()
+  const queryClient = useQueryClient()
 
   
   const { data: eventData, isLoading, error } = useQuery({
@@ -60,21 +62,27 @@ function EventDetailPage() {
   // const { data: bri, isLoading: cancellationIsLoading, error: cancellationError, isSuccess: cancellationSuccess } 
   
   
-  const cancelMutation = useMutation({
-    mutationKey: ['event', eventId],
-    mutationFn: () => execute(CancelEventRegistrationMutation, { id: eventId }),
-    onMutate: ()=> console.log("optimistic update"),
-    // onSuccess
-    // handle concurrent updates
-    scope: {
-    id: 'cancel',
-  },
-  })
+  // const cancelMutation = useMutation({
+  //   mutationKey: ['event', eventId],
+  //   mutationFn: () => execute(CancelEventRegistrationMutation, { id: eventId }),
+  //   onMutate: ()=> console.log("optimistic update"),
+  //   onSuccess: () => {
+  //     // Invalidate and refetch the event query to update registration status
+  //     queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+  //   },
+  //   // handle concurrent updates
+  //   scope: {
+  //   id: 'cancel',
+  // },
+  // })
   const registerMutation = useMutation({
     mutationKey: ['event', eventId],
     mutationFn: () => execute(RegisterForEventMutation, { eventId: eventId }),
     onMutate: ()=> console.log("optimistic update"),
-    // onSuccess
+    onSuccess: () => {
+      // Invalidate and refetch the event query to update registration status
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+    },
     // handle concurrent updates
     scope: {
     id: 'register',
@@ -137,10 +145,10 @@ const handleRegister = ()=>{
   console.log('result',result)
 }
 const handleCancel = ()=>{
-  cancelMutation.mutate()
+  // cancelMutation.mutate()
 }
 
-const currentUserIsRegistered = false
+const currentUserIsRegistered = eventData?.event?.currentUserIsRegistered || false
 
 const { isLoading: registrationLoading, error: registrationError} = registerMutation
 const loadingMessage = "Loading..."
@@ -154,7 +162,7 @@ const registrationButton = registrationLoading ? loadingMessage : <ActionButton
               Register
             </ActionButton>
 
-const cancellationButton = cancelMutation.isLoading? loadingMessage:<ActionButton 
+const cancellationButton = true? loadingMessage:<ActionButton 
               $size="small" 
               $variant="danger"
               onClick={handleCancel}
@@ -326,7 +334,7 @@ const cancellationButton = cancelMutation.isLoading? loadingMessage:<ActionButto
             <Spacer $size="sm" />
             {currentUserIsRegistered ? cancellationButton : registrationButton }
             <Spacer $size="sm" />
-            {registrationError || cancelMutation.error && "Error! try again later"}
+            {registrationError &&"Error! try again later"}
             {/* brianna success message */}
             </>
           )}

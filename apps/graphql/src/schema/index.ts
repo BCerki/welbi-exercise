@@ -329,6 +329,26 @@ const EventType = builder.objectRef<Event>('Event').implement({
     }),
     status: t.exposeString('status'),
     notes: t.exposeString('notes', { nullable: true }),
+    currentUserIsRegistered: t.boolean({
+      resolve: async (obj, _, ctx) => {
+        if (!ctx.user) return false;
+        
+        const result = await ctx.db
+          .select()
+          .from(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, obj.id),
+              eq(dbSchema.eventParticipants.userId, ctx.user.id),
+              // brianna do you want attended
+              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+            )
+          )
+          .limit(1);
+        
+        return result.length > 0;
+      }
+    }),
     createdAt: t.field({ 
       type: 'DateTime', 
       resolve: (obj) => timestampToDate(obj.createdAt)?.toISOString() || new Date().toISOString()

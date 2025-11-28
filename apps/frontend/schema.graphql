@@ -10,6 +10,7 @@ type Event {
   availableSpots: Int
   createdAt: DateTime
   currentParticipants: Int
+  currentUserIsRegistered: Boolean
   description: String
   duration: Int
   endTime: DateTime
@@ -126,9 +127,8 @@ type Location {
 }
 
 type Mutation {
-  cancelEventRegistration(id: ID!): Boolean
   ping: String
-  registerForEvent(eventId: ID!): EventRegistrationResult!
+  registerForEvent(eventId: ID!): EventRegistrationResult
 }
 
 enum ParticipantStatus {
