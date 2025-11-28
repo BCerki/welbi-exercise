@@ -69,6 +69,7 @@ function EventDetailPage() {
     queryFn: () => execute(EventDetailQuery, { id: eventId }),
   })
 
+  console.log('eventData',eventData)
   const registerMutation = useMutation({
     mutationKey: ['event', eventId],
     mutationFn: () => execute(RegisterForEventMutation, { eventId: eventId }),
