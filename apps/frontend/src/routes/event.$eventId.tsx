@@ -90,9 +90,8 @@ function EventDetailPage() {
             ...old.event,
             currentUserIsRegistered: false,
             currentParticipants: Math.max(0, (old.event.currentParticipants || 0) - 1),
-            availableSpots: old.event.maxParticipants 
-              ? (old.event.availableSpots || 0) + 1 
-              : old.event.availableSpots,
+            availableSpots:  (old.event.availableSpots || 0) + 1 
+           ,
           },
         }
       })
@@ -134,9 +133,7 @@ function EventDetailPage() {
             ...old.event,
             currentUserIsRegistered: true,
             currentParticipants: (old.event.currentParticipants || 0) + 1,
-            availableSpots: old.event.maxParticipants 
-              ? Math.max(0, (old.event.availableSpots || 0) - 1)
-              : old.event.availableSpots,
+            availableSpots: (old.event.availableSpots || 0) - 1
           },
         }
       })
