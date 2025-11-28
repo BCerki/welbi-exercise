@@ -413,7 +413,7 @@ function HomePage() {
                       <Typography $variant="body2">
                         Status: {event.status}
                       </Typography>
-                      {healthData?.health.currentUser && (
+                      {healthData?.health?.currentUser && (
                       <Typography $variant="body2">
                                     Registration status: {event.currentUserIsRegistered ? 'Registered' : 'Not Registered'}
                                   </Typography>)}
