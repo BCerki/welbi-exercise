@@ -22,9 +22,6 @@ type EventRegistrationResult = {
   currentParticipants?: number;
 };
 
-// EventParticipant type from database
-type EventParticipant = typeof dbSchema.eventParticipants.$inferSelect;
-
 // Event status enum values
 type EventStatus = 'scheduled' | 'cancelled' | 'completed';
 type RecurrenceType = 'daily' | 'weekly' | 'monthly' | 'yearly';
@@ -255,22 +252,6 @@ const EventRegistrationResultType = builder.objectRef<EventRegistrationResult>('
   }),
 });
 
-// EventParticipant type
-const EventParticipantType = builder.objectRef<EventParticipant>('EventParticipant').implement({
-  fields: (t) => ({
-    id: t.exposeID('id'),
-    eventId: t.exposeID('eventId'),
-    userId: t.exposeID('userId'),
-    status: t.exposeString('status'),
-    registeredAt: t.field({
-      type: 'DateTime',
-      resolve: (obj) => timestampToDate(obj.registeredAt)?.toISOString() || null,
-      nullable: true,
-    }),
-    notes: t.exposeString('notes', { nullable: true }),
-  }),
-});
-
 const RecurrencePatternType = builder.objectRef<RecurrencePattern>('RecurrencePattern').implement({
   fields: (t) => ({
     id: t.exposeID('id'),
@@ -318,7 +299,7 @@ const EventType = builder.objectRef<Event>('Event').implement({
           .where(
             and(
               eq(dbSchema.eventParticipants.eventId, obj.id),
-              inArray(dbSchema.eventParticipants.status, ['registered','attended'])
+              inArray(dbSchema.eventParticipants.status, ['registered'])
             )
           );
         
@@ -376,26 +357,6 @@ const EventType = builder.objectRef<Event>('Event').implement({
           .limit(1);
         
         return result.length > 0;
-      }
-    }),
-    currentUserParticipant: t.field({
-      type: EventParticipantType,
-      nullable: true,
-      resolve: async (obj, _, ctx) => {
-        if (!ctx.user) return null;
-        
-        const result = await ctx.db
-          .select()
-          .from(dbSchema.eventParticipants)
-          .where(
-            and(
-              eq(dbSchema.eventParticipants.eventId, obj.id),
-              eq(dbSchema.eventParticipants.userId, ctx.user.id)
-            )
-          )
-          .limit(1);
-        
-        return result[0] || null;
       }
     }),
     createdAt: t.field({ 
