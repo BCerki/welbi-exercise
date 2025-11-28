@@ -37,6 +37,7 @@ input EventFiltersInput {
 }
 
 type EventRegistrationResult {
+  currentParticipants: Int
   eventId: ID
   userId: ID
 }

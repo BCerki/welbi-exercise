@@ -19,6 +19,7 @@ type Event = typeof dbSchema.events.$inferSelect;
 type EventRegistrationResult = {
   userId: string;
   eventId: string;
+  currentParticipants?: number;
 };
 
 // Event status enum values
@@ -244,6 +245,10 @@ const EventRegistrationResultType = builder.objectRef<EventRegistrationResult>('
   fields: (t) => ({
     userId: t.exposeID('userId'),
     eventId: t.exposeID('eventId'),
+    currentParticipants: t.int({
+      nullable: true,
+      resolve: (obj) => obj.currentParticipants,
+    }),
   }),
 });
 
@@ -287,14 +292,14 @@ const EventType = builder.objectRef<Event>('Event').implement({
     maxParticipants: t.exposeInt('maxParticipants', { nullable: true }),
     currentParticipants: t.int({ 
       resolve: async (obj, _, ctx) => {
-        // Count participants with 'registered' or 'attended' status
+        // Count participants with 'registered' status
         const result = await ctx.db
           .select({ count: count() })
           .from(dbSchema.eventParticipants)
           .where(
             and(
               eq(dbSchema.eventParticipants.eventId, obj.id),
-              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+              inArray(dbSchema.eventParticipants.status, ['registered'])
             )
           );
         
@@ -658,7 +663,6 @@ builder.mutationType({
         
         // 2. Get user from context (authenticated user)
         const userId = ctx.user?.id;
-        console.log("ctx----------------",ctx)
         if (!userId) {
           throw new Error('You must log in before registering');
         }
@@ -675,9 +679,23 @@ builder.mutationType({
           })
           .returning();
         
+        // Count participants AFTER the insert to get updated currentParticipants
+        const participantCount = await ctx.db
+          .select({ count: count() })
+          .from(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, eventId),
+              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+            )
+          );
+        
+        const currentParticipants = participantCount[0]?.count || 0;
+        
         return {
           userId: userId.toString(),
           eventId: eventId.toString(),
+          currentParticipants: currentParticipants,
         };
       },
     }),
@@ -723,9 +741,23 @@ builder.mutationType({
             )
           );
 
+        // Count participants AFTER the delete to get updated currentParticipants
+        const participantCount = await ctx.db
+          .select({ count: count() })
+          .from(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, eventId),
+              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+            )
+          );
+        
+        const currentParticipants = participantCount[0]?.count || 0;
+
         return {
           userId: userId.toString(),
           eventId: eventId.toString(),
+          currentParticipants: currentParticipants,
         };
       },
     }),
