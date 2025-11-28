@@ -35,15 +35,15 @@ Implement a complete event registration system that allows users to:
 2. **Business Logic**
    - FE yes, BE if more time | Prevent registration when event is at capacity
    - FE yes, BE if more time | Prevent duplicate registrations by the same user
-   - Update `currentParticipants` count when registrations change
+   - YES Update `currentParticipants` count when registrations change
    - Handle concurrent registration attempts properly
-   - Add proper validation and error messages
+   - YES Add proper validation and error messages
 
 3. **Authorization**
-   - Use the existing CASL permission system
-   - FE Only authenticated users can register for events
-   - FE Users can only cancel their own registrations
-   - Add appropriate permission checks
+   - YES Use the existing CASL permission system
+   - YES Only authenticated users can register for events
+   - YES Users can only cancel their own registrations
+   - YES Add appropriate permission checks
 
 ### Frontend (React) Requirements
 
@@ -56,7 +56,7 @@ Implement a complete event registration system that allows users to:
 2. **User Experience**
    - YES Show loading states during registration/cancellation
    - Display success/error messages clearly
-   - Use optimistic updates with rollback on failure
+   - YES Use optimistic updates with rollback on failure
    - YES Disable registration button when appropriate (full capacity, already registered)
 
 3. **Events List Integration**

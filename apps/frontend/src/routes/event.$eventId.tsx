@@ -208,10 +208,15 @@ function EventDetailPage() {
     }
   }
 
-const handleRegister = ()=>{
-  const result = registerMutation.mutate()
+const handleRegister = () => {
+  // Clear any previous errors when retrying
+  registerMutation.reset()
+  registerMutation.mutate()
 }
-const handleCancel = ()=>{
+
+const handleCancel = () => {
+  // Clear any previous errors when retrying
+  cancelMutation.reset()
   cancelMutation.mutate()
 }
 
