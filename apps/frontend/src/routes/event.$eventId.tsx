@@ -400,7 +400,7 @@ const cancellationButton = cancellationLoading? loadingMessage:<ActionButton
             <Spacer $size="sm" />
             {currentUserIsRegistered ? cancellationButton : registrationButton }
             <Spacer $size="sm" />
-            {registrationError &&"Error! try again later"}
+            {registrationError?.message || cancellationError?.message}
             {/* brianna success message */}
             </>
           )}
