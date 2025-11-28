@@ -27,12 +27,14 @@ const EventDetailQuery = graphql(`
       registrationDeadline
       status
       notes
-      currentUser {
+      currentUserParticipant {
         id
-        name
-        email
+        eventId
+        userId
+        status
+        registeredAt
+        notes
       }
-      currentUserIsRegistered
       createdAt
       updatedAt
     }
@@ -85,13 +87,25 @@ function EventDetailPage() {
       // Optimistically update the cache
       queryClient.setQueryData(['event', eventId], (old: typeof eventData) => {
         if (!old?.event) return old
+        // Create a mock participant record for optimistic update
+        const mockParticipant = old.event.currentUserParticipant ? {
+          id: 'temp',
+          eventId: eventId,
+          userId: old.event.currentUserParticipant.id,
+          status: 'registered' as const,
+          registeredAt: new Date().toISOString(),
+          notes: null,
+        } : null
+        
         return {
           ...old,
           event: {
             ...old.event,
-            currentUserIsRegistered: true,
+            currentUserParticipant: mockParticipant,
             currentParticipants: (old.event.currentParticipants || 0) + 1,
-            availableSpots: (old.event.availableSpots || 0) - 1
+            availableSpots: old.event.maxParticipants 
+              ? Math.max(0, (old.event.availableSpots || 0) - 1)
+              : old.event.availableSpots,
           },
         }
       })
@@ -131,10 +145,11 @@ function EventDetailPage() {
           ...old,
           event: {
             ...old.event,
-            currentUserIsRegistered: false,
+            currentUserParticipant: null, // Remove participant record on cancel
             currentParticipants: Math.max(0, (old.event.currentParticipants || 0) - 1),
-            availableSpots:  (old.event.availableSpots || 0) + 1 
-           ,
+            availableSpots: old.event.maxParticipants 
+              ? Math.max(0, (old.event.availableSpots || 0) + 1)
+              : old.event.availableSpots,
           },
         }
       })
@@ -215,8 +230,9 @@ const handleCancel = ()=>{
   cancelMutation.mutate()
 }
 
-const currentUser = eventData?.event?.currentUser
-const currentUserIsRegistered = eventData?.event?.currentUserIsRegistered || false
+const currentUser = eventData?.event?.currentUserParticipant
+console.log('currentUser',currentUser)
+const currentUserParticipant = eventData?.event?.currentUserParticipant
 const isLoggedIn = !!currentUser
 
 const { isLoading: registrationLoading, error: registrationError } = registerMutation
@@ -227,7 +243,7 @@ const registrationButton = registrationLoading ? loadingMessage : <ActionButton
               $size="small" 
               $variant="danger"
               onClick={handleRegister}
-              disabled={event.availableSpots && event.availableSpots < 1 || currentUserIsRegistered }
+              disabled={(event.availableSpots !== null && event.availableSpots !== undefined && event.availableSpots < 1) || currentUser?.status === 'registered' }
             >
               Register
             </ActionButton>
@@ -402,9 +418,14 @@ const cancellationButton = cancellationLoading ? loadingMessage : <ActionButton
             <Spacer $size="sm" />
             {isLoggedIn ? (
               <>
-                Your registration status is: {currentUserIsRegistered ? 'Registered' : 'Not registered'}
+                Your registration status is: {currentUser?.status}
+                {currentUserParticipant && (
+                  <Typography $variant="body2" $color="muted">
+                    Participant status: {currentUserParticipant.status} (registered at: {currentUserParticipant.registeredAt ? new Date(currentUserParticipant.registeredAt).toLocaleString() : 'N/A'})
+                  </Typography>
+                )}
                 <Spacer $size="sm" />
-                {currentUserIsRegistered ? cancellationButton : registrationButton }
+                {currentUser?.status === 'registered' ? cancellationButton : registrationButton }
               </>
             ) : (
               <Typography $variant="body2" $color="muted">

@@ -12,6 +12,7 @@ type Event {
   currentParticipants: Int
   currentUser: User
   currentUserIsRegistered: Boolean
+  currentUserParticipant: EventParticipant
   description: String
   duration: Int
   endTime: DateTime
@@ -39,6 +40,15 @@ input EventFiltersInput {
   status: [EventStatus!]
   tagIds: [String!]
   wellnessDimensionIds: [String!]
+}
+
+type EventParticipant {
+  eventId: ID
+  id: ID
+  notes: String
+  registeredAt: DateTime
+  status: String
+  userId: ID
 }
 
 type EventRegistrationResult {

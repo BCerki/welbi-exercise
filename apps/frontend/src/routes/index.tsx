@@ -103,45 +103,45 @@ function HomePage() {
   })
 
   // Listen for mutations and optimistically update the events list
-  React.useEffect(() => {
-    const unsubscribe = queryClient.getMutationCache().subscribe((mutation) => {
-      if (mutation.state.status === 'pending') {
-        const mutationKey = mutation.options.mutationKey
-        // Check if this is a register or cancel mutation
-        if (Array.isArray(mutationKey) && mutationKey[0] === 'event' && mutationKey[1]) {
-          const eventId = mutationKey[1] as string
-          const mutationFn = mutation.options.mutationFn
+  // React.useEffect(() => {
+  //   const unsubscribe = queryClient.getMutationCache().subscribe((mutation) => {
+  //     if (mutation.state.status === 'pending') {
+  //       const mutationKey = mutation.options.mutationKey
+  //       // Check if this is a register or cancel mutation
+  //       if (Array.isArray(mutationKey) && mutationKey[0] === 'event' && mutationKey[1]) {
+  //         const eventId = mutationKey[1] as string
+  //         const mutationFn = mutation.options.mutationFn
           
-          // Determine if it's register or cancel based on mutation function name
-          const isRegister = mutationFn?.toString().includes('registerForEvent')
-          const isCancel = mutationFn?.toString().includes('cancelEventRegistration')
+  //         // Determine if it's register or cancel based on mutation function name
+  //         const isRegister = mutationFn?.toString().includes('registerForEvent')
+  //         const isCancel = mutationFn?.toString().includes('cancelEventRegistration')
           
-          if (isRegister || isCancel) {
-            // Optimistically update the events list
-            queryClient.setQueryData(['events'], (old: any) => {
-              if (!old?.events) return old
-              return {
-                ...old,
-                events: old.events.map((e: any) => 
-                  e.id === eventId
-                    ? {
-                        ...e,
-                        currentUserIsRegistered: isRegister ? true : false,
-                        currentParticipants: isRegister 
-                          ? (e.currentParticipants || 0) + 1
-                          : Math.max(0, (e.currentParticipants || 0) - 1),
-                      }
-                    : e
-                ),
-              }
-            })
-          }
-        }
-      }
-    })
+  //         if (isRegister || isCancel) {
+  //           // Optimistically update the events list
+  //           queryClient.setQueryData(['events'], (old: any) => {
+  //             if (!old?.events) return old
+  //             return {
+  //               ...old,
+  //               events: old.events.map((e: any) => 
+  //                 e.id === eventId
+  //                   ? {
+  //                       ...e,
+  //                       currentUserIsRegistered: isRegister ? true : false,
+  //                       currentParticipants: isRegister 
+  //                         ? (e.currentParticipants || 0) + 1
+  //                         : Math.max(0, (e.currentParticipants || 0) - 1),
+  //                     }
+  //                   : e
+  //               ),
+  //             }
+  //           })
+  //         }
+  //       }
+  //     }
+  //   })
 
-    return () => unsubscribe()
-  }, [queryClient])
+  //   return () => unsubscribe()
+  // }, [queryClient])
 
   const { data: calendarEventsData, isLoading: calendarEventsLoading, error: calendarEventsError } = useQuery({
     queryKey: ['calendar-events'],

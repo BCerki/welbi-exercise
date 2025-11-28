@@ -25,6 +25,7 @@ export type Event = {
   currentParticipants?: Maybe<Scalars['Int']['output']>;
   currentUser?: Maybe<User>;
   currentUserIsRegistered?: Maybe<Scalars['Boolean']['output']>;
+  currentUserParticipant?: Maybe<EventParticipant>;
   description?: Maybe<Scalars['String']['output']>;
   duration?: Maybe<Scalars['Int']['output']>;
   endTime?: Maybe<Scalars['DateTime']['output']>;
@@ -52,6 +53,16 @@ export type EventFiltersInput = {
   status?: InputMaybe<Array<EventStatus>>;
   tagIds?: InputMaybe<Array<Scalars['String']['input']>>;
   wellnessDimensionIds?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type EventParticipant = {
+  __typename?: 'EventParticipant';
+  eventId?: Maybe<Scalars['ID']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  notes?: Maybe<Scalars['String']['output']>;
+  registeredAt?: Maybe<Scalars['DateTime']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+  userId?: Maybe<Scalars['ID']['output']>;
 };
 
 export type EventRegistrationResult = {
@@ -297,7 +308,7 @@ export type EventDetailQueryVariables = Exact<{
 }>;
 
 
-export type EventDetailQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, duration?: number | null, allDay?: boolean | null, maxParticipants?: number | null, currentParticipants?: number | null, availableSpots?: number | null, registrationRequired?: boolean | null, registrationDeadline?: any | null, status?: string | null, notes?: string | null, currentUserIsRegistered?: boolean | null, createdAt?: any | null, updatedAt?: any | null, currentUser?: { __typename?: 'User', id?: string | null, name?: string | null, email?: string | null } | null } | null };
+export type EventDetailQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, duration?: number | null, allDay?: boolean | null, maxParticipants?: number | null, currentParticipants?: number | null, availableSpots?: number | null, registrationRequired?: boolean | null, registrationDeadline?: any | null, status?: string | null, notes?: string | null, createdAt?: any | null, updatedAt?: any | null, currentUserParticipant?: { __typename?: 'EventParticipant', id?: string | null, eventId?: string | null, userId?: string | null, status?: string | null, registeredAt?: any | null, notes?: string | null } | null } | null };
 
 export type CancelEventRegistrationMutationVariables = Exact<{
   eventId: Scalars['ID']['input'];
@@ -368,12 +379,14 @@ export const EventDetailDocument = new TypedDocumentString(`
     registrationDeadline
     status
     notes
-    currentUser {
+    currentUserParticipant {
       id
-      name
-      email
+      eventId
+      userId
+      status
+      registeredAt
+      notes
     }
-    currentUserIsRegistered
     createdAt
     updatedAt
   }
