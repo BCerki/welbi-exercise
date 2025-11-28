@@ -72,13 +72,13 @@ Implement a complete event registration system that allows users to:
 
 2. **Error Handling**
    - Handle network errors gracefully
-   - YES | Show meaningful error messages to users
+   - Show meaningful error messages to users
    - Implement proper error boundaries
 
 3. **State Management**
-   - YES | Use TanStack Query for server state management
-   - YES | Implement proper cache invalidation
-   - YES |Handle optimistic updates correctly
+   - Use TanStack Query for server state management
+   - Implement proper cache invalidation
+   - Handle optimistic updates correctly
 
 ## Deliverables
 
