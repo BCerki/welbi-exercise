@@ -689,7 +689,8 @@ builder.mutationType({
         const eventId = parseInt(args.eventId);
         const userId = ctx.user.id;
 
-        // Find the user's registration for this event
+        // Security: Verify the registration exists and belongs to the authenticated user
+        // Users can only cancel their own registrations
         const registration = await ctx.db
           .select()
           .from(dbSchema.eventParticipants)
@@ -703,16 +704,16 @@ builder.mutationType({
           .limit(1);
 
         if (!registration.length) {
-          throw new Error('Registration not found or already cancelled');
+          throw new Error('Registration not found. You can only cancel your own registrations.');
         }
 
-        // Delete the registration
+        // Delete the registration - userId filter ensures users can only delete their own
         await ctx.db
           .delete(dbSchema.eventParticipants)
           .where(
             and(
               eq(dbSchema.eventParticipants.eventId, eventId),
-              eq(dbSchema.eventParticipants.userId, userId)
+              eq(dbSchema.eventParticipants.userId, userId) // Only delete registrations belonging to the authenticated user
             )
           );
 
