@@ -42,26 +42,6 @@ const EventsQuery = graphql(`
     }
   }
 `)
-// const EventsQuery = graphql(`
-//   query Events($limit: Int) {
-//     events(limit: $limit) {
-//       id
-//       title
-//       description
-//       startTime
-//       endTime
-//       currentParticipants
-//       maxParticipants
-//       registrationRequired
-//       status
-//     }
-//     eventParticipants(eventId: $id) {
-//       id
-//       eventId
-//       userId
-//     }
-//   }
-// `)
 
 const CalendarEventsQuery = graphql(`
   query CalendarEvents($limit: Int) {
@@ -162,21 +142,7 @@ function HomePage() {
           ),
         }
       })
-      
-      queryClient.setQueryData(['calendar-events'], (old: typeof calendarEventsData) => {
-        if (!old?.events) return old
-        return {
-          ...old,
-          events: old.events.map((event) => 
-            event.id === eventId
-              ? {
-                  ...event,
-                  currentParticipants: (event.currentParticipants || 0) + 1,
-                }
-              : event
-          ),
-        }
-      })
+    
     })
 
     // Handle cancel mutations
