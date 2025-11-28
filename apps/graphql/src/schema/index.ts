@@ -298,7 +298,7 @@ const EventType = builder.objectRef<Event>('Event').implement({
           .where(
             and(
               eq(dbSchema.eventParticipants.eventId, obj.id),
-              inArray(dbSchema.eventParticipants.status, ['registered','attended'])
+              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
             )
           );
         

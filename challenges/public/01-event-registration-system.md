@@ -61,7 +61,7 @@ Implement a complete event registration system that allows users to:
 
 3. **Events List Integration**
    - YES | Show registration status indicators on the events list
-   - YES? (unless this specifically means optimistic update) | Update the UI immediately after registration changes
+   - YES | Update the UI immediately after registration changes
 
 ### Technical Requirements
 

@@ -10,7 +10,6 @@ import { graphql } from '../graphql'
 import { execute } from '../graphql/execute'
 
 // GraphQL query for a single event with all details
-// brianna
 const EventDetailQuery = graphql(`
   query EventDetail($id: ID!) {
     event(id: $id) {
@@ -58,7 +57,9 @@ const RegisterForEventMutation = graphql(`
 
 function EventDetailPage() {
   const { eventId } = Route.useParams()
+  // Prep queryClient for use in optimistic updates
   const queryClient = useQueryClient()
+
   const [registerSuccess, setRegisterSuccess] = useState(false)
   const [cancelSuccess, setCancelSuccess] = useState(false)
 
@@ -91,7 +92,7 @@ function EventDetailPage() {
             ...old.event,
             currentUserIsRegistered: true,
             currentParticipants: (old.event.currentParticipants || 0) + 1,
-            availableSpots: (old.event.availableSpots || 0) - 1
+            availableSpots: Math.max(0,(old.event.availableSpots || 0) - 1)
           },
         }
       })
@@ -106,7 +107,6 @@ function EventDetailPage() {
       }
     },
     onSuccess: () => {
-      // Show success message
       setRegisterSuccess(true)
       // Clear success message after 3 seconds
       setTimeout(() => setRegisterSuccess(false), 3000)
@@ -114,6 +114,7 @@ function EventDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['event', eventId] })
     },
   })
+
  const cancelMutation = useMutation({
     mutationKey: ['event', eventId],
     mutationFn: () => execute(CancelEventRegistrationMutation, { eventId: eventId }),
@@ -153,7 +154,6 @@ function EventDetailPage() {
       }
     },
     onSuccess: () => {
-      // Show success message
       setCancelSuccess(true)
       // Clear success message after 3 seconds
       setTimeout(() => setCancelSuccess(false), 3000)
@@ -232,11 +232,12 @@ const isLoggedIn = !!currentUser
 
 const { isPending: registrationLoading, error: registrationError } = registerMutation
 const { isPending: cancellationLoading, error: cancellationError } = cancelMutation
+
 const loadingMessage = "Loading..."
 
 const registrationButton = registrationLoading ? loadingMessage : <ActionButton 
               $size="small" 
-              $variant="danger"
+              $variant="secondary"
               onClick={handleRegister}
               disabled={event.availableSpots && event.availableSpots < 1 || currentUserIsRegistered }
             >
@@ -262,6 +263,11 @@ const cancellationButton = cancellationLoading ? loadingMessage : <ActionButton
           <StatusBadge $status={event.status as 'scheduled' | 'completed' | 'cancelled' || 'scheduled'}>
             {getStatusText(event.status || 'scheduled')}
           </StatusBadge>
+          {event.registrationRequired && (
+            <StatusBadge $status="warning">
+              Registration Required
+            </StatusBadge>
+          )}
           {event.allDay && (
             <StatusBadge $status="info">
               All Day Event
@@ -407,9 +413,6 @@ const cancellationButton = cancellationLoading ? loadingMessage : <ActionButton
               <Spacer $size="sm" />
 {event.registrationRequired && (
             <>
-            <StatusBadge $status="warning">
-              Registration Required
-            </StatusBadge>
             <Spacer $size="sm" />
             {isLoggedIn ? (
               <>
