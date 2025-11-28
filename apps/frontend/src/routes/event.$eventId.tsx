@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { 
   Card, Box, Typography, CardContent, Grid, GridItem,
   StatusBadge, InfoBox, ProgressBar, ProgressBarFill, ActionButton, 
@@ -58,6 +59,8 @@ const RegisterForEventMutation = graphql(`
 function EventDetailPage() {
   const { eventId } = Route.useParams()
   const queryClient = useQueryClient()
+  const [registerSuccess, setRegisterSuccess] = useState(false)
+  const [cancelSuccess, setCancelSuccess] = useState(false)
 
   
   const { data: eventData, isLoading, error } = useQuery({
@@ -106,6 +109,10 @@ function EventDetailPage() {
       }
     },
     onSuccess: () => {
+      // Show success message
+      setRegisterSuccess(true)
+      // Clear success message after 3 seconds
+      setTimeout(() => setRegisterSuccess(false), 3000)
       // Invalidate and refetch to ensure consistency with server
       queryClient.invalidateQueries({ queryKey: ['event', eventId] })
     },
@@ -149,6 +156,10 @@ function EventDetailPage() {
       }
     },
     onSuccess: () => {
+      // Show success message
+      setCancelSuccess(true)
+      // Clear success message after 3 seconds
+      setTimeout(() => setCancelSuccess(false), 3000)
       // Invalidate and refetch to ensure consistency with server
       queryClient.invalidateQueries({ queryKey: ['event', eventId] })
     },
@@ -209,14 +220,16 @@ function EventDetailPage() {
   }
 
 const handleRegister = () => {
-  // Clear any previous errors when retrying
+  // Clear any previous errors and success messages when retrying
   registerMutation.reset()
+  setRegisterSuccess(false)
   registerMutation.mutate()
 }
 
 const handleCancel = () => {
-  // Clear any previous errors when retrying
+  // Clear any previous errors and success messages when retrying
   cancelMutation.reset()
+  setCancelSuccess(false)
   cancelMutation.mutate()
 }
 
@@ -417,12 +430,21 @@ const cancellationButton = cancellationLoading ? loadingMessage : <ActionButton
               </Typography>
             )}
             <Spacer $size="sm" />
+            {registerSuccess && (
+              <Typography $variant="body2" $color="success">
+                ✅ Successfully registered for this event!
+              </Typography>
+            )}
+            {cancelSuccess && (
+              <Typography $variant="body2" $color="success">
+                ✅ Successfully cancelled your registration!
+              </Typography>
+            )}
             {(registrationError || cancellationError) && (
               <Typography $variant="body2" $color="error">
                 {registrationError?.message || cancellationError?.message}
               </Typography>
             )}
-            {/* brianna success message */}
             </>
           )}
               {event.registrationDeadline && (
