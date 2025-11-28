@@ -20,6 +20,6 @@ If I was submitting this work as a PR, I'd clean up my commit history with a reb
 I had trouble with many of the configuration and setup steps, so that took up a lot of time I'd set aside for the challenge. If I'd had more time, I would have liked to:
 - handle concurrent updates on the server
 - use the status from `eventParticipant` rather than hardcoding on the frontend (I took a crack at it in bdd7ab16a8e367959d3f8e1917ce7d7f596079db but stopped to better respect the timebox)
-- look at optimistic updates in the event list and other parts of the app
+- reduce the duplication across the register/cancel functionality
 - run accessibility checks
 - write tests
