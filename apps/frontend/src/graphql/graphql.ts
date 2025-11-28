@@ -148,8 +148,14 @@ export type Location = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  cancelEventRegistration?: Maybe<EventRegistrationResult>;
   ping?: Maybe<Scalars['String']['output']>;
   registerForEvent?: Maybe<EventRegistrationResult>;
+};
+
+
+export type MutationCancelEventRegistrationArgs = {
+  eventId: Scalars['ID']['input'];
 };
 
 
@@ -291,12 +297,19 @@ export type EventDetailQueryVariables = Exact<{
 
 export type EventDetailQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, duration?: number | null, allDay?: boolean | null, maxParticipants?: number | null, currentParticipants?: number | null, availableSpots?: number | null, registrationRequired?: boolean | null, registrationDeadline?: any | null, status?: string | null, notes?: string | null, currentUserIsRegistered?: boolean | null, createdAt?: any | null, updatedAt?: any | null } | null };
 
+export type CancelEventRegistrationMutationVariables = Exact<{
+  eventId: Scalars['ID']['input'];
+}>;
+
+
+export type CancelEventRegistrationMutation = { __typename?: 'Mutation', cancelEventRegistration?: { __typename?: 'EventRegistrationResult', eventId?: string | null, userId?: string | null } | null };
+
 export type RegisterForEventMutationVariables = Exact<{
   eventId: Scalars['ID']['input'];
 }>;
 
 
-export type RegisterForEventMutation = { __typename?: 'Mutation', registerForEvent?: { __typename?: 'EventRegistrationResult', eventId?: string | null } | null };
+export type RegisterForEventMutation = { __typename?: 'Mutation', registerForEvent?: { __typename?: 'EventRegistrationResult', eventId?: string | null, userId?: string | null } | null };
 
 export type HealthQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -359,10 +372,19 @@ export const EventDetailDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<EventDetailQuery, EventDetailQueryVariables>;
+export const CancelEventRegistrationDocument = new TypedDocumentString(`
+    mutation cancelEventRegistration($eventId: ID!) {
+  cancelEventRegistration(eventId: $eventId) {
+    eventId
+    userId
+  }
+}
+    `) as unknown as TypedDocumentString<CancelEventRegistrationMutation, CancelEventRegistrationMutationVariables>;
 export const RegisterForEventDocument = new TypedDocumentString(`
     mutation registerForEvent($eventId: ID!) {
   registerForEvent(eventId: $eventId) {
     eventId
+    userId
   }
 }
     `) as unknown as TypedDocumentString<RegisterForEventMutation, RegisterForEventMutationVariables>;

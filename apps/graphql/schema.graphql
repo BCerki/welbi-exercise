@@ -122,6 +122,7 @@ type Location {
 }
 
 type Mutation {
+  cancelEventRegistration(eventId: ID!): EventRegistrationResult
   ping: String
   registerForEvent(eventId: ID!): EventRegistrationResult
 }

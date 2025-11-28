@@ -675,6 +675,53 @@ builder.mutationType({
         };
       },
     }),
+    cancelEventRegistration: t.field({
+      type: EventRegistrationResultType,
+      args: {
+        eventId: t.arg.id({ required: true }),
+      },
+      resolve: async (_, args, ctx) => {
+        // Check authentication
+        if (!ctx.user) {
+          throw new Error('User must be authenticated to cancel registrations');
+        }
+
+        const eventId = parseInt(args.eventId);
+        const userId = ctx.user.id;
+
+        // Find the user's registration for this event
+        const registration = await ctx.db
+          .select()
+          .from(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, eventId),
+              eq(dbSchema.eventParticipants.userId, userId),
+              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+            )
+          )
+          .limit(1);
+
+        if (!registration.length) {
+          throw new Error('Registration not found or already cancelled');
+        }
+
+        // Delete the registration
+        await ctx.db
+          .delete(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, eventId),
+              eq(dbSchema.eventParticipants.userId, userId)
+            )
+          );
+
+        return {
+          userId: userId.toString(),
+          eventId: eventId.toString(),
+        };
+      },
+    }),
   }),
 });
 

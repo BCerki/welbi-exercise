@@ -34,15 +34,19 @@ const EventDetailQuery = graphql(`
   }
 `)
 
-// const CancelEventRegistrationMutation = graphql(`
-//   mutation cancelEventRegistration($id: ID!) { 
-//   cancelEventRegistration(id: $id)
-// }`)
+const CancelEventRegistrationMutation = graphql(`
+  mutation cancelEventRegistration($eventId: ID!) { 
+  cancelEventRegistration(eventId: $eventId) {
+    eventId
+    userId
+  }
+}`)
 
 const RegisterForEventMutation = graphql(`
   mutation registerForEvent($eventId: ID!) { 
   registerForEvent(eventId: $eventId) {
     eventId
+    userId
   }
 }`)
 
@@ -62,19 +66,19 @@ function EventDetailPage() {
   // const { data: bri, isLoading: cancellationIsLoading, error: cancellationError, isSuccess: cancellationSuccess } 
   
   
-  // const cancelMutation = useMutation({
-  //   mutationKey: ['event', eventId],
-  //   mutationFn: () => execute(CancelEventRegistrationMutation, { id: eventId }),
-  //   onMutate: ()=> console.log("optimistic update"),
-  //   onSuccess: () => {
-  //     // Invalidate and refetch the event query to update registration status
-  //     queryClient.invalidateQueries({ queryKey: ['event', eventId] })
-  //   },
-  //   // handle concurrent updates
-  //   scope: {
-  //   id: 'cancel',
-  // },
-  // })
+  const cancelMutation = useMutation({
+    mutationKey: ['event', eventId],
+    mutationFn: () => execute(CancelEventRegistrationMutation, { eventId: eventId }),
+    onMutate: ()=> console.log("optimistic update"),
+    onSuccess: () => {
+      // Invalidate and refetch the event query to update registration status
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+    },
+    // handle concurrent updates
+    scope: {
+    id: 'cancel',
+  },
+  })
   const registerMutation = useMutation({
     mutationKey: ['event', eventId],
     mutationFn: () => execute(RegisterForEventMutation, { eventId: eventId }),
@@ -142,15 +146,15 @@ function EventDetailPage() {
 
 const handleRegister = ()=>{
   const result = registerMutation.mutate()
-  console.log('result',result)
 }
 const handleCancel = ()=>{
-  // cancelMutation.mutate()
+  cancelMutation.mutate()
 }
 
 const currentUserIsRegistered = eventData?.event?.currentUserIsRegistered || false
 
 const { isLoading: registrationLoading, error: registrationError} = registerMutation
+const { isLoading: cancellationLoading, error: cancellationError} = cancelMutation
 const loadingMessage = "Loading..."
 
 const registrationButton = registrationLoading ? loadingMessage : <ActionButton 
@@ -162,7 +166,7 @@ const registrationButton = registrationLoading ? loadingMessage : <ActionButton
               Register
             </ActionButton>
 
-const cancellationButton = true? loadingMessage:<ActionButton 
+const cancellationButton = cancellationLoading? loadingMessage:<ActionButton 
               $size="small" 
               $variant="danger"
               onClick={handleCancel}
