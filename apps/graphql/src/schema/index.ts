@@ -667,8 +667,56 @@ builder.mutationType({
           throw new Error('You must log in before registering');
         }
         
-        // 3. Access database via ctx.db
-        // 4. Insert into eventParticipants table
+        // Check if user is already registered
+        const existingRegistration = await ctx.db
+          .select()
+          .from(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, eventId),
+              eq(dbSchema.eventParticipants.userId, userId),
+              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+            )
+          )
+          .limit(1);
+        
+        if (existingRegistration.length > 0) {
+          throw new Error('You are already registered for this event');
+        }
+        
+        // Get event details to check capacity
+        const event = await ctx.db
+          .select()
+          .from(dbSchema.events)
+          .where(eq(dbSchema.events.id, eventId))
+          .limit(1);
+        
+        if (event.length === 0) {
+          throw new Error('Event not found');
+        }
+        
+        const eventData = event[0];
+        
+        // Check capacity if maxParticipants is set
+        if (eventData.maxParticipants !== null && eventData.maxParticipants !== undefined) {
+          const participantCount = await ctx.db
+            .select({ count: count() })
+            .from(dbSchema.eventParticipants)
+            .where(
+              and(
+                eq(dbSchema.eventParticipants.eventId, eventId),
+                inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+              )
+            );
+          
+          const currentParticipants = participantCount[0]?.count || 0;
+          
+          if (currentParticipants >= eventData.maxParticipants) {
+            throw new Error('Event is at full capacity');
+          }
+        }
+        
+        // Insert into eventParticipants table
         const result = await ctx.db
           .insert(dbSchema.eventParticipants)
           .values({

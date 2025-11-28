@@ -78,6 +78,10 @@ function EventDetailPage() {
   const registerMutation = useMutation({
     mutationKey: ['event', eventId],
     mutationFn: () => execute(RegisterForEventMutation, { eventId: eventId }),
+    retry: false,
+    scope: {
+      id: `register-${eventId}`, // Prevent concurrent registrations for this event
+    },
     onMutate: async () => {
       // Cancel any outgoing refetches to avoid overwriting optimistic update
       await queryClient.cancelQueries({ queryKey: ['event', eventId] })
@@ -116,14 +120,14 @@ function EventDetailPage() {
       // Invalidate and refetch to ensure consistency with server
       queryClient.invalidateQueries({ queryKey: ['event', eventId] })
     },
-    // handle concurrent updates
-    scope: {
-    id: 'register',
-  },
   })
  const cancelMutation = useMutation({
     mutationKey: ['event', eventId],
     mutationFn: () => execute(CancelEventRegistrationMutation, { eventId: eventId }),
+    retry: false,
+    scope: {
+      id: `cancel-${eventId}`, // Prevent concurrent cancellations for this event
+    },
     onMutate: async () => {
       // Cancel any outgoing refetches to avoid overwriting optimistic update
       await queryClient.cancelQueries({ queryKey: ['event', eventId] })
@@ -163,10 +167,6 @@ function EventDetailPage() {
       // Invalidate and refetch to ensure consistency with server
       queryClient.invalidateQueries({ queryKey: ['event', eventId] })
     },
-    // handle concurrent updates
-    scope: {
-    id: 'cancel',
-  },
   })
   if (isLoading) {
     return (
