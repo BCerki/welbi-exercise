@@ -29,39 +29,39 @@ Implement a complete event registration system that allows users to:
 ### Backend (GraphQL) Requirements
 
 1. **Add Registration Mutations**
-   - `registerForEvent(eventId: ID!): EventRegistrationResult!`
-   - `cancelEventRegistration(eventId: ID!): EventRegistrationResult!`
+   - YES | `registerForEvent(eventId: ID!): EventRegistrationResult!`
+   - YES | `cancelEventRegistration(eventId: ID!): EventRegistrationResult!`
 
 2. **Business Logic**
-   - FE yes, BE if more time | Prevent registration when event is at capacity
-   - FE yes, BE if more time | Prevent duplicate registrations by the same user
-   - YES Update `currentParticipants` count when registrations change
-   - Handle concurrent registration attempts properly
-   - YES Add proper validation and error messages
+   - YES | Prevent registration when event is at capacity
+   - YES | Prevent duplicate registrations by the same user
+   - YES | Update `currentParticipants` count when registrations change
+   - FE | handle concurrent registration attempts properly
+   - YES | Add proper validation and error messages
 
 3. **Authorization**
-   - YES Use the existing CASL permission system
-   - YES Only authenticated users can register for events
-   - YES Users can only cancel their own registrations
-   - YES Add appropriate permission checks
+   - YES | Use the existing CASL permission system
+   - YES | Only authenticated users can register for events
+   - YES | Users can only cancel their own registrations
+   - YES | Add appropriate permission checks
 
 ### Frontend (React) Requirements
 
 1. **Event Detail Page Enhancement**
-   - YES Add registration button to `/event/$eventId` page 
-   - YES Show current registration status (registered/not registered) 
-   - ALREADY DONE Display available spots vs. total capacity 
-   - YES Handle different states: loading, success, error
+   - YES | Add registration button to `/event/$eventId` page 
+   - YES | Show current registration status (registered/not registered) 
+   - ALREADY DONE | Display available spots vs. total capacity 
+   - YES | Handle different states: loading, success, error
 
 2. **User Experience**
-   - YES Show loading states during registration/cancellation
-   - Display success/error messages clearly
-   - YES Use optimistic updates with rollback on failure
-   - YES Disable registration button when appropriate (full capacity, already registered)
+   - YES | Show loading states during registration/cancellation
+   - YES | Display success/error messages clearly
+   - YES | Use optimistic updates with rollback on failure
+   - YES | Disable registration button when appropriate (full capacity, already registered)
 
 3. **Events List Integration**
-   - YES Show registration status indicators on the events list
-   - Update the UI immediately after registration changes
+   - YES | Show registration status indicators on the events list
+   - YES? (unless this specifically means optimistic update) | Update the UI immediately after registration changes
 
 ### Technical Requirements
 
@@ -72,13 +72,13 @@ Implement a complete event registration system that allows users to:
 
 2. **Error Handling**
    - Handle network errors gracefully
-   - Show meaningful error messages to users
+   - YES | Show meaningful error messages to users
    - Implement proper error boundaries
 
 3. **State Management**
-   - Use TanStack Query for server state management
-   - Implement proper cache invalidation
-   - Handle optimistic updates correctly
+   - YES | Use TanStack Query for server state management
+   - YES | Implement proper cache invalidation
+   - YES |Handle optimistic updates correctly
 
 ## Deliverables
 
