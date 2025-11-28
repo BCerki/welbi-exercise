@@ -215,8 +215,8 @@ const handleCancel = ()=>{
 
 const currentUserIsRegistered = eventData?.event?.currentUserIsRegistered || false
 
-const { isLoading: registrationLoading, error: registrationError} = registerMutation
-const { isLoading: cancellationLoading, error: cancellationError} = cancelMutation
+const { isLoading: registrationLoading, error: registrationError } = registerMutation
+const { isLoading: cancellationLoading, error: cancellationError } = cancelMutation
 const loadingMessage = "Loading..."
 
 const registrationButton = registrationLoading ? loadingMessage : <ActionButton 
@@ -400,7 +400,11 @@ const cancellationButton = cancellationLoading? loadingMessage:<ActionButton
             <Spacer $size="sm" />
             {currentUserIsRegistered ? cancellationButton : registrationButton }
             <Spacer $size="sm" />
-            {registrationError?.message || cancellationError?.message}
+            {(registrationError || cancellationError) && (
+              <Typography $variant="body2" $color="error">
+                {registrationError?.message || cancellationError?.message}
+              </Typography>
+            )}
             {/* brianna success message */}
             </>
           )}
