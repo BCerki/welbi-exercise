@@ -80,7 +80,7 @@ function EventDetailPage() {
     mutationFn: () => execute(RegisterForEventMutation, { eventId: eventId }),
     retry: false,
     scope: {
-      id: `register-${eventId}`, // Prevent concurrent registrations for this event
+      id: `registration-${eventId}`, // Prevent concurrent Prevent concurrent registrations/cancellations for this event
     },
     onMutate: async () => {
       // Cancel any outgoing refetches to avoid overwriting optimistic update
@@ -126,7 +126,7 @@ function EventDetailPage() {
     mutationFn: () => execute(CancelEventRegistrationMutation, { eventId: eventId }),
     retry: false,
     scope: {
-      id: `cancel-${eventId}`, // Prevent concurrent cancellations for this event
+      id: `registration-${eventId}`, // Prevent concurrent registrations/cancellations for this event
     },
     onMutate: async () => {
       // Cancel any outgoing refetches to avoid overwriting optimistic update
