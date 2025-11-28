@@ -56,6 +56,7 @@ export type EventFiltersInput = {
 
 export type EventRegistrationResult = {
   __typename?: 'EventRegistrationResult';
+  currentParticipants?: Maybe<Scalars['Int']['output']>;
   eventId?: Maybe<Scalars['ID']['output']>;
   userId?: Maybe<Scalars['ID']['output']>;
 };
@@ -322,7 +323,7 @@ export type EventsQueryVariables = Exact<{
 }>;
 
 
-export type EventsQuery = { __typename?: 'Query', events?: Array<{ __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, currentParticipants?: number | null, maxParticipants?: number | null, registrationRequired?: boolean | null, status?: string | null }> | null };
+export type EventsQuery = { __typename?: 'Query', events?: Array<{ __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, currentParticipants?: number | null, maxParticipants?: number | null, registrationRequired?: boolean | null, status?: string | null, currentUserIsRegistered?: boolean | null }> | null };
 
 export type CalendarEventsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -418,6 +419,7 @@ export const EventsDocument = new TypedDocumentString(`
     maxParticipants
     registrationRequired
     status
+    currentUserIsRegistered
   }
 }
     `) as unknown as TypedDocumentString<EventsQuery, EventsQueryVariables>;

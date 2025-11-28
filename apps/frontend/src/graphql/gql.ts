@@ -19,7 +19,7 @@ type Documents = {
     "\n  mutation cancelEventRegistration($eventId: ID!) { \n  cancelEventRegistration(eventId: $eventId) {\n    eventId\n    userId\n  }\n}": typeof types.CancelEventRegistrationDocument,
     "\n  mutation registerForEvent($eventId: ID!) { \n  registerForEvent(eventId: $eventId) {\n    eventId\n    userId\n  }\n}": typeof types.RegisterForEventDocument,
     "\n  query Health {\n    health {\n      status\n      currentUser {\n        id\n        name\n        email\n      }\n    }\n  }\n": typeof types.HealthDocument,
-    "\n  query Events($limit: Int) {\n    events(limit: $limit) {\n      id\n      title\n      description\n      startTime\n      endTime\n      currentParticipants\n      maxParticipants\n      registrationRequired\n      status\n    }\n  }\n": typeof types.EventsDocument,
+    "\n  query Events($limit: Int) {\n    events(limit: $limit) {\n      id\n      title\n      description\n      startTime\n      endTime\n      currentParticipants\n      maxParticipants\n      registrationRequired\n      status\n      currentUserIsRegistered\n    }\n  }\n": typeof types.EventsDocument,
     "\n  query CalendarEvents($limit: Int) {\n    events(limit: $limit) {\n      id\n      title\n      startTime\n      endTime\n      status\n      description\n      currentParticipants\n      maxParticipants\n    }\n  }\n": typeof types.CalendarEventsDocument,
 };
 const documents: Documents = {
@@ -27,7 +27,7 @@ const documents: Documents = {
     "\n  mutation cancelEventRegistration($eventId: ID!) { \n  cancelEventRegistration(eventId: $eventId) {\n    eventId\n    userId\n  }\n}": types.CancelEventRegistrationDocument,
     "\n  mutation registerForEvent($eventId: ID!) { \n  registerForEvent(eventId: $eventId) {\n    eventId\n    userId\n  }\n}": types.RegisterForEventDocument,
     "\n  query Health {\n    health {\n      status\n      currentUser {\n        id\n        name\n        email\n      }\n    }\n  }\n": types.HealthDocument,
-    "\n  query Events($limit: Int) {\n    events(limit: $limit) {\n      id\n      title\n      description\n      startTime\n      endTime\n      currentParticipants\n      maxParticipants\n      registrationRequired\n      status\n    }\n  }\n": types.EventsDocument,
+    "\n  query Events($limit: Int) {\n    events(limit: $limit) {\n      id\n      title\n      description\n      startTime\n      endTime\n      currentParticipants\n      maxParticipants\n      registrationRequired\n      status\n      currentUserIsRegistered\n    }\n  }\n": types.EventsDocument,
     "\n  query CalendarEvents($limit: Int) {\n    events(limit: $limit) {\n      id\n      title\n      startTime\n      endTime\n      status\n      description\n      currentParticipants\n      maxParticipants\n    }\n  }\n": types.CalendarEventsDocument,
 };
 
@@ -50,7 +50,7 @@ export function graphql(source: "\n  query Health {\n    health {\n      status\
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Events($limit: Int) {\n    events(limit: $limit) {\n      id\n      title\n      description\n      startTime\n      endTime\n      currentParticipants\n      maxParticipants\n      registrationRequired\n      status\n    }\n  }\n"): typeof import('./graphql').EventsDocument;
+export function graphql(source: "\n  query Events($limit: Int) {\n    events(limit: $limit) {\n      id\n      title\n      description\n      startTime\n      endTime\n      currentParticipants\n      maxParticipants\n      registrationRequired\n      status\n      currentUserIsRegistered\n    }\n  }\n"): typeof import('./graphql').EventsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

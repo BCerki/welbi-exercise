@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { Card, Box, Typography, CardContent, Calendar, Grid, GridItem } from '@testwelbi/ui'
+import { Card, Box, Typography, CardContent, Calendar, Grid, GridItem, StatusBadge } from '@testwelbi/ui'
 import type { CalendarEvent } from '@testwelbi/ui'
 import { graphql } from '../graphql'
 import { execute } from '../graphql/execute'
@@ -38,6 +38,7 @@ const EventsQuery = graphql(`
       maxParticipants
       registrationRequired
       status
+      currentUserIsRegistered
     }
   }
 `)
@@ -371,13 +372,16 @@ function HomePage() {
                         Status: {event.status}
                       </Typography>
                       <Typography $variant="body2">
-                        {healthData?.health?.currentUser && `Your registration status is: `} 
-                      </Typography>
+                                    Registration status: {event.currentUserIsRegistered ? 'Registered' : 'Not Registered'}
+                                  </Typography>
+                      
                       {event.currentParticipants !== null && (
                         <Typography $variant="body2">
                           Participants: {event.currentParticipants}{event.maxParticipants && `/${event.maxParticipants}`}
                         </Typography>
+                        
                       )}
+                      
                     </Box>
                   ))}
                 </Box>
