@@ -106,7 +106,7 @@ function EventDetailPage() {
       // Return context with the previous value for rollback
       return { previousEventData }
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       // Rollback to the previous value on error
       if (context?.previousEventData) {
         queryClient.setQueryData(['event', eventId], context.previousEventData)
@@ -153,7 +153,7 @@ function EventDetailPage() {
       // Return context with the previous value for rollback
       return { previousEventData }
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       // Rollback to the previous value on error
       if (context?.previousEventData) {
         queryClient.setQueryData(['event', eventId], context.previousEventData)
@@ -237,8 +237,8 @@ const currentUser = eventData?.event?.currentUser
 const currentUserIsRegistered = eventData?.event?.currentUserIsRegistered || false
 const isLoggedIn = !!currentUser
 
-const { isLoading: registrationLoading, error: registrationError } = registerMutation
-const { isLoading: cancellationLoading, error: cancellationError } = cancelMutation
+const { isPending: registrationLoading, error: registrationError } = registerMutation
+const { isPending: cancellationLoading, error: cancellationError } = cancelMutation
 const loadingMessage = "Loading..."
 
 const registrationButton = registrationLoading ? loadingMessage : <ActionButton 
