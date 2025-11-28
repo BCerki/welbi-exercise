@@ -308,7 +308,7 @@ export type RegisterForEventMutationVariables = Exact<{
 }>;
 
 
-export type RegisterForEventMutation = { __typename?: 'Mutation', registerForEvent: { __typename?: 'EventRegistrationResult', userId?: string | null, eventId?: string | null } };
+export type RegisterForEventMutation = { __typename?: 'Mutation', registerForEvent: { __typename?: 'EventRegistrationResult', eventId?: string | null } };
 
 export type HealthQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -378,7 +378,6 @@ export const CancelEventRegistrationDocument = new TypedDocumentString(`
 export const RegisterForEventDocument = new TypedDocumentString(`
     mutation registerForEvent($eventId: ID!) {
   registerForEvent(eventId: $eventId) {
-    userId
     eventId
   }
 }

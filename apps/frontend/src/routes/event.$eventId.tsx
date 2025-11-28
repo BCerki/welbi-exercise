@@ -41,7 +41,6 @@ const CancelEventRegistrationMutation = graphql(`
 const RegisterForEventMutation = graphql(`
   mutation registerForEvent($eventId: ID!) { 
   registerForEvent(eventId: $eventId) {
-    userId
     eventId
   }
 }`)
@@ -69,6 +68,16 @@ function EventDetailPage() {
     // handle concurrent updates
     scope: {
     id: 'cancel',
+  },
+  })
+  const registerMutation = useMutation({
+    mutationKey: ['event', eventId],
+    mutationFn: () => execute(RegisterForEventMutation, { eventId: eventId }),
+    onMutate: ()=> console.log("optimistic update"),
+    // onSuccess
+    // handle concurrent updates
+    scope: {
+    id: 'register',
   },
   })
 
@@ -124,21 +133,19 @@ function EventDetailPage() {
   }
 
 const handleRegister = ()=>{
-  console.log("register")
+  const result = registerMutation.mutate()
+  console.log('result',result)
 }
 const handleCancel = ()=>{
   cancelMutation.mutate()
 }
 
-const currentUserIsRegistered = true
+const currentUserIsRegistered = false
 
-const registrationIsLoading = false
-
-const registrationError = true
-
+const { isLoading: registrationLoading, error: registrationError} = registerMutation
 const loadingMessage = "Loading..."
 
-const registrationButton = registrationIsLoading ? loadingMessage : <ActionButton 
+const registrationButton = registrationLoading ? loadingMessage : <ActionButton 
               $size="small" 
               $variant="danger"
               onClick={handleRegister}

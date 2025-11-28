@@ -15,6 +15,12 @@ type EventSeries = typeof dbSchema.eventSeries.$inferSelect;
 type RecurrencePattern = typeof dbSchema.recurrencePatterns.$inferSelect;
 type Event = typeof dbSchema.events.$inferSelect;
 
+// Custom types
+type EventRegistrationResult = {
+  userId: string;
+  eventId: string;
+};
+
 // Event status enum values
 type EventStatus = 'scheduled' | 'cancelled' | 'completed';
 type RecurrenceType = 'daily' | 'weekly' | 'monthly' | 'yearly';
@@ -231,6 +237,13 @@ const EventSeriesType = builder.objectRef<EventSeries>('EventSeries').implement(
       type: 'DateTime', 
       resolve: (obj) => timestampToDate(obj.updatedAt)?.toISOString() || new Date().toISOString()
     }),
+  }),
+});
+
+const EventRegistrationResultType = builder.objectRef<EventRegistrationResult>('EventRegistrationResult').implement({
+  fields: (t) => ({
+    userId: t.exposeID('userId'),
+    eventId: t.exposeID('eventId'),
   }),
 });
 
@@ -609,8 +622,42 @@ builder.mutationType({
     ping: t.string({
       resolve: () => 'pong',
     }),
+    registerForEvent: t.field({
+      type: EventRegistrationResultType,
+      args: {
+        eventId: t.arg.id({ required: true }),
+      },
+      resolve: async (_, args, ctx) => {
+        // 1. Extract data from mutation arguments
+        const eventId = parseInt(args.eventId);
+        
+        // 2. Get user from context (authenticated user)
+        const userId = ctx.user?.id;
+        if (!userId) {
+          throw new Error('You must log in before registering');
+        }
+        
+        // 3. Access database via ctx.db
+        // 4. Insert into eventParticipants table
+        const result = await ctx.db
+          .insert(dbSchema.eventParticipants)
+          .values({
+            eventId: eventId,
+            userId: userId,
+            status: 'registered',
+            registeredAt: Date.now() / 1000, // Unix timestamp
+          })
+          .returning();
+        
+        return {
+          userId: userId.toString(),
+          eventId: eventId.toString(),
+        };
+      },
+    }),
   }),
 });
+
 
 // Build and export schema
 export function createSchema() {
