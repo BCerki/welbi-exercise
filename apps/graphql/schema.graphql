@@ -5,6 +5,7 @@ type Event {
   availableSpots: Int
   createdAt: DateTime
   currentParticipants: Int
+  currentUser: User
   currentUserIsRegistered: Boolean
   description: String
   duration: Int

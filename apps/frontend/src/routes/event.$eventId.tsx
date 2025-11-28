@@ -27,6 +27,11 @@ const EventDetailQuery = graphql(`
       registrationDeadline
       status
       notes
+      currentUser {
+        id
+        name
+        email
+      }
       currentUserIsRegistered
       createdAt
       updatedAt
@@ -213,7 +218,9 @@ const handleCancel = ()=>{
   cancelMutation.mutate()
 }
 
+const currentUser = eventData?.event?.currentUser
 const currentUserIsRegistered = eventData?.event?.currentUserIsRegistered || false
+const isLoggedIn = !!currentUser
 
 const { isLoading: registrationLoading, error: registrationError } = registerMutation
 const { isLoading: cancellationLoading, error: cancellationError } = cancelMutation
@@ -228,7 +235,7 @@ const registrationButton = registrationLoading ? loadingMessage : <ActionButton
               Register
             </ActionButton>
 
-const cancellationButton = cancellationLoading? loadingMessage:<ActionButton 
+const cancellationButton = cancellationLoading ? loadingMessage : <ActionButton 
               $size="small" 
               $variant="danger"
               onClick={handleCancel}
@@ -396,9 +403,17 @@ const cancellationButton = cancellationLoading? loadingMessage:<ActionButton
               Registration Required
             </StatusBadge>
             <Spacer $size="sm" />
-            Your registration status is: {currentUserIsRegistered ? 'Registered' : 'Not registered'}
-            <Spacer $size="sm" />
-            {currentUserIsRegistered ? cancellationButton : registrationButton }
+            {isLoggedIn ? (
+              <>
+                Your registration status is: {currentUserIsRegistered ? 'Registered' : 'Not registered'}
+                <Spacer $size="sm" />
+                {currentUserIsRegistered ? cancellationButton : registrationButton }
+              </>
+            ) : (
+              <Typography $variant="body2" $color="muted">
+                Please log in to register for this event
+              </Typography>
+            )}
             <Spacer $size="sm" />
             {(registrationError || cancellationError) && (
               <Typography $variant="body2" $color="error">

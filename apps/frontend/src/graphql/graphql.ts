@@ -23,6 +23,7 @@ export type Event = {
   availableSpots?: Maybe<Scalars['Int']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   currentParticipants?: Maybe<Scalars['Int']['output']>;
+  currentUser?: Maybe<User>;
   currentUserIsRegistered?: Maybe<Scalars['Boolean']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   duration?: Maybe<Scalars['Int']['output']>;
@@ -295,7 +296,7 @@ export type EventDetailQueryVariables = Exact<{
 }>;
 
 
-export type EventDetailQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, duration?: number | null, allDay?: boolean | null, maxParticipants?: number | null, currentParticipants?: number | null, availableSpots?: number | null, registrationRequired?: boolean | null, registrationDeadline?: any | null, status?: string | null, notes?: string | null, currentUserIsRegistered?: boolean | null, createdAt?: any | null, updatedAt?: any | null } | null };
+export type EventDetailQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, duration?: number | null, allDay?: boolean | null, maxParticipants?: number | null, currentParticipants?: number | null, availableSpots?: number | null, registrationRequired?: boolean | null, registrationDeadline?: any | null, status?: string | null, notes?: string | null, currentUserIsRegistered?: boolean | null, createdAt?: any | null, updatedAt?: any | null, currentUser?: { __typename?: 'User', id?: string | null, name?: string | null, email?: string | null } | null } | null };
 
 export type CancelEventRegistrationMutationVariables = Exact<{
   eventId: Scalars['ID']['input'];
@@ -366,6 +367,11 @@ export const EventDetailDocument = new TypedDocumentString(`
     registrationDeadline
     status
     notes
+    currentUser {
+      id
+      name
+      email
+    }
     currentUserIsRegistered
     createdAt
     updatedAt

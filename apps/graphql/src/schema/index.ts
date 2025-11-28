@@ -329,6 +329,11 @@ const EventType = builder.objectRef<Event>('Event').implement({
     }),
     status: t.exposeString('status'),
     notes: t.exposeString('notes', { nullable: true }),
+    currentUser: t.field({
+      type: UserType,
+      nullable: true,
+      resolve: (obj, _, ctx) => ctx.user || null,
+    }),
     currentUserIsRegistered: t.boolean({
       resolve: async (obj, _, ctx) => {
         if (!ctx.user) return false;
@@ -653,6 +658,7 @@ builder.mutationType({
         
         // 2. Get user from context (authenticated user)
         const userId = ctx.user?.id;
+        console.log("ctx----------------",ctx)
         if (!userId) {
           throw new Error('You must log in before registering');
         }
