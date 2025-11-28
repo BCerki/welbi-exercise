@@ -15,7 +15,7 @@ type EventSeries = typeof dbSchema.eventSeries.$inferSelect;
 type RecurrencePattern = typeof dbSchema.recurrencePatterns.$inferSelect;
 type Event = typeof dbSchema.events.$inferSelect;
 
-// Custom types
+// Result types
 type EventRegistrationResult = {
   userId: string;
   eventId: string;
@@ -350,7 +350,6 @@ const EventType = builder.objectRef<Event>('Event').implement({
             and(
               eq(dbSchema.eventParticipants.eventId, obj.id),
               eq(dbSchema.eventParticipants.userId, ctx.user.id),
-              // brianna do you want attended
               inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
             )
           )
@@ -658,10 +657,9 @@ builder.mutationType({
         eventId: t.arg.id({ required: true }),
       },
       resolve: async (_, args, ctx) => {
-        // 1. Extract data from mutation arguments
         const eventId = parseInt(args.eventId);
         
-        // 2. Get user from context (authenticated user)
+        // Get user from context (authenticated user)
         const userId = ctx.user?.id;
         if (!userId) {
           throw new Error('You must log in before registering');
@@ -684,7 +682,7 @@ builder.mutationType({
           throw new Error('You are already registered for this event');
         }
         
-        // Get event details to check capacity
+        // Check capacity
         const event = await ctx.db
           .select()
           .from(dbSchema.events)
@@ -696,8 +694,7 @@ builder.mutationType({
         }
         
         const eventData = event[0];
-        
-        // Check capacity if maxParticipants is set
+
         if (eventData.maxParticipants !== null && eventData.maxParticipants !== undefined) {
           const participantCount = await ctx.db
             .select({ count: count() })
@@ -753,15 +750,14 @@ builder.mutationType({
         eventId: t.arg.id({ required: true }),
       },
       resolve: async (_, args, ctx) => {
-        // Check authentication
-        if (!ctx.user) {
-          throw new Error('User must be authenticated to cancel registrations');
+        const eventId = parseInt(args.eventId);
+        
+        // Get user from context (authenticated user)
+        const userId = ctx.user?.id;
+        if (!userId) {
+          throw new Error('You must log in before registering');
         }
 
-        const eventId = parseInt(args.eventId);
-        const userId = ctx.user.id;
-
-        // Security: Verify the registration exists and belongs to the authenticated user
         // Users can only cancel their own registrations
         const registration = await ctx.db
           .select()
