@@ -1,0 +1,48 @@
+{
+  "name": "@testwelbi/graphql",
+  "version": "0.1.0",
+  "description": "GraphQL API server using Pothos",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "DATABASE_URL=sqlite:../../database.sqlite bun run src/index.ts",
+    "start": "DATABASE_URL=sqlite:../../database.sqlite node dist/index.js",
+    "clean": "rimraf dist",
+    "generate-schema": "bun run src/generate-schema.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@pothos/core": "latest",
+    "@pothos/plugin-scope-auth": "latest",
+    "@pothos/plugin-relay": "latest",
+    "@pothos/plugin-sub-graph": "latest",
+    "@pothos/plugin-tracing": "latest",
+    "@pothos/plugin-zod": "latest",
+    "apollo-server-express": "latest",
+    "express": "latest",
+    "graphql": "latest",
+    "graphql-scalars": "latest",
+    "zod": "latest",
+    "drizzle-orm": "latest",
+    "cors": "latest",
+    "helmet": "latest",
+    "morgan": "latest",
+    "@testwelbi/types": "workspace:*",
+    "@testwelbi/permissions": "workspace:*",
+    "@testwelbi/drizzle": "workspace:*",
+    "@testwelbi/env-parser": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "tsx": "latest",
+    "rimraf": "latest",
+    "@types/node": "latest",
+    "@types/express": "latest",
+    "@types/cors": "latest",
+    "@types/morgan": "latest",
+    "@types/bun": "latest"
+  }
+} 

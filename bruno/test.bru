@@ -1,0 +1,17 @@
+meta {
+  name: test
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: http://localhost/graphql
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  {
+    health
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@testwelbi/graphql-schema",
+  "version": "1.0.0",
+  "description": "Generated GraphQL schema and types",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "graphql": "latest",
+    "@testwelbi/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "rimraf": "latest",
+    "@types/bun": "latest"
+  }
+} 

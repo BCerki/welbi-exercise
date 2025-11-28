@@ -1,0 +1,30 @@
+{
+  "name": "@testwelbi/ui",
+  "version": "1.0.0",
+  "description": "UI components using Base UI",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "source": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bun run build:parcel",
+    "build:parcel": "parcel build src/index.ts --dist-dir dist",
+    "dev": "parcel watch src/index.ts --dist-dir dist",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@parcel/macros": "~2.15.4",
+    "@parcel/packager-ts": "^2.15.4",
+    "@parcel/transformer-typescript-types": "^2.15.4",
+    "@types/react": "latest",
+    "@types/bun": "latest",
+    "parcel": "latest",
+    "typescript": "latest",
+    "rimraf": "latest"
+  },
+  "peerDependencies": {
+    "react": "latest",
+    "react-dom": "latest"
+  }
+}

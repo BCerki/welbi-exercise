@@ -1,0 +1,40 @@
+{
+  "name": "@testwelbi/frontend",
+  "version": "0.1.0",
+  "description": "React frontend application",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "clean": "rimraf dist",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "codegen:watch": "graphql-codegen --config codegen.ts --watch"
+  },
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest",
+    "@tanstack/react-router": "latest",
+    "@tanstack/react-query": "latest",
+    "@tanstack/router-devtools": "latest",
+    "@graphql-typed-document-node/core": "latest",
+    "@testwelbi/ui": "workspace:*",
+    "@testwelbi/types": "workspace:*",
+    "@testwelbi/query-client": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/node": "latest",
+    "@types/bun": "latest",
+    "@vitejs/plugin-react": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "rimraf": "latest",
+    "@tanstack/router-vite-plugin": "~1.123.2",
+    "@graphql-codegen/cli": "latest",
+    "@graphql-codegen/client-preset": "latest",
+    "@graphql-codegen/schema-ast": "latest",
+    "graphql": "latest"
+  }
+} 

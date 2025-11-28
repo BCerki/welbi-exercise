@@ -1,0 +1,29 @@
+{
+  "name": "@testwelbi/time",
+  "version": "0.1.0",
+  "description": "Time utilities and helpers",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rimraf dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "date-fns": "latest",
+    "date-fns-tz": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "rimraf": "latest",
+    "@types/node": "latest",
+    "@types/bun": "latest"
+  },
+  "files": [
+    "dist"
+  ]
+} 

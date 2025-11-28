@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # Nginx proxy
+  proxy:
+    container_name: testwelbi-proxy
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/proxy/nginx:/etc/nginx
+    depends_on:
+      - frontend
+      - graphql
+    networks:
+      - testwelbi-network
+
+  # Frontend development server
+  frontend:
+    container_name: testwelbi-frontend
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile.dev
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_GRAPHQL_URL=http://localhost/graphql
+    ports:
+      - "5173:5173"
+    networks:
+      - testwelbi-network
+
+  # GraphQL backend
+  graphql:
+    container_name: testwelbi-graphql
+    build:
+      context: .
+      dockerfile: apps/graphql/Dockerfile.dev
+    volumes:
+      - ./apps/graphql:/app
+      - ./libs:/libs
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+      - HOST=0.0.0.0
+      - DATABASE_URL=postgresql://postgres:password@db:5432/testwelbi
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    networks:
+      - testwelbi-network
+
+  # PostgreSQL database
+  db:
+    container_name: testwelbi-db
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=testwelbi
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - testwelbi-network
+
+networks:
+  testwelbi-network:
+    driver: bridge
+
+volumes:
+  postgres_data: 

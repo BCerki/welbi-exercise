@@ -1,0 +1,24 @@
+{
+  "name": "@testwelbi/drizzle",
+  "version": "1.0.0",
+  "description": "Database schema and migrations using Drizzle ORM",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "migrate": "bun run src/migrate.ts",
+    "setup-db": "bun run create-db-bun.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "latest",
+    "drizzle-kit": "latest",
+    "@testwelbi/types": "workspace:*",
+    "@testwelbi/env-parser": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "@types/bun": "latest"
+  }
+} 

@@ -1,0 +1,29 @@
+{
+  "name": "@testwelbi/env-parser",
+  "version": "1.0.0",
+  "description": "Environment configuration parser with validation",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rimraf dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "zod": "latest",
+    "@testwelbi/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "rimraf": "latest",
+    "@types/node": "latest",
+    "@types/bun": "latest"
+  },
+  "files": [
+    "dist"
+  ]
+} 

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+  "rushVersion": "5.153.1",
+  "pnpmVersion": "9.15.3",
+  "nodeSupportedVersionRange": ">=18.11.0 < 23.0.0",
+  "ensureConsistentVersions": true,
+  "projectFolderMinDepth": 2,
+  "projectFolderMaxDepth": 2,
+  "gitPolicy": {},
+  "repository": {},
+  "eventHooks": {
+    "preRushInstall": [],
+    "postRushInstall": [],
+    "preRushBuild": [],
+    "postRushBuild": []
+  },
+  "variants": [],
+  "projects": [
+    {
+      "packageName": "@testwelbi/frontend",
+      "projectFolder": "apps/frontend"
+    },
+    {
+      "packageName": "@testwelbi/graphql",
+      "projectFolder": "apps/graphql"
+    },
+    {
+      "packageName": "@testwelbi/ui",
+      "projectFolder": "libs/ui"
+    },
+    {
+      "packageName": "@testwelbi/types",
+      "projectFolder": "libs/types"
+    },
+    {
+      "packageName": "@testwelbi/permissions",
+      "projectFolder": "libs/permissions"
+    },
+    {
+      "packageName": "@testwelbi/drizzle",
+      "projectFolder": "libs/drizzle"
+    },
+    {
+      "packageName": "@testwelbi/graphql-schema",
+      "projectFolder": "libs/graphql-schema"
+    },
+    {
+      "packageName": "@testwelbi/math",
+      "projectFolder": "libs/math"
+    },
+    {
+      "packageName": "@testwelbi/time",
+      "projectFolder": "libs/time"
+    },
+    {
+      "packageName": "@testwelbi/env-parser",
+      "projectFolder": "libs/env-parser"
+    },
+    {
+      "packageName": "@testwelbi/query-client",
+      "projectFolder": "libs/query-client"
+    },
+    {
+      "packageName": "@testwelbi/seeds",
+      "projectFolder": "libs/seeds"
+    },
+    {
+      "packageName": "@testwelbi/locales",
+      "projectFolder": "libs/locales"
+    },
+    {
+      "packageName": "@testwelbi/tracking",
+      "projectFolder": "libs/tracking"
+    }
+  ]
+}

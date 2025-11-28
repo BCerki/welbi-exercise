@@ -1,0 +1,25 @@
+{
+  "name": "@testwelbi/seeds",
+  "version": "1.0.0",
+  "description": "Database seeding utilities",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rimraf dist",
+    "seed": "bun run dist/index.js",
+    "seed:dev": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "@testwelbi/drizzle": "workspace:*",
+    "@testwelbi/types": "workspace:*",
+    "@testwelbi/env-parser": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "rimraf": "latest",
+    "@types/bun": "latest"
+  }
+} 

@@ -1,0 +1,198 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+scalar DateTime
+
+type Event {
+  allDay: Boolean
+  availableSpots: Int
+  createdAt: DateTime
+  currentParticipants: Int
+  description: String
+  duration: Int
+  endTime: DateTime
+  id: ID
+  maxParticipants: Int
+  notes: String
+  registrationDeadline: DateTime
+  registrationRequired: Boolean
+  startTime: DateTime
+  status: String
+  title: String
+  updatedAt: DateTime
+}
+
+input EventFiltersInput {
+  endDate: DateTime
+  facilitatorIds: [String!]
+  hasAvailableSpots: Boolean
+  hobbyIds: [String!]
+  levelOfCareIds: [String!]
+  locationIds: [String!]
+  registrationRequired: Boolean
+  seriesIds: [String!]
+  startDate: DateTime
+  status: [EventStatus!]
+  tagIds: [String!]
+  wellnessDimensionIds: [String!]
+}
+
+type EventSeries {
+  createdAt: DateTime
+  description: String
+  id: ID
+  isActive: Boolean
+  name: String
+  updatedAt: DateTime
+}
+
+enum EventSortField {
+  createdAt
+  currentParticipants
+  startTime
+  title
+}
+
+input EventSortInput {
+  direction: SortDirection!
+  field: EventSortField!
+}
+
+enum EventStatus {
+  cancelled
+  completed
+  scheduled
+}
+
+type Facilitator {
+  createdAt: DateTime
+  department: String
+  email: String
+  employeeId: String
+  firstName: String
+  fullName: String
+  hireDate: DateTime
+  id: ID
+  isActive: Boolean
+  lastName: String
+  phone: String
+  position: String
+  specialties: [String!]
+  updatedAt: DateTime
+}
+
+type HealthCheck {
+  currentUser: User
+  status: String
+}
+
+type Hobby {
+  category: String
+  createdAt: DateTime
+  description: String
+  id: ID
+  isActive: Boolean
+  name: String
+}
+
+type LevelOfCare {
+  createdAt: DateTime
+  description: String
+  id: ID
+  isActive: Boolean
+  level: Int
+  name: String
+  requirements: [String!]
+}
+
+type Location {
+  accessibility: [String!]
+  capacity: Int
+  createdAt: DateTime
+  description: String
+  equipment: [String!]
+  id: ID
+  isActive: Boolean
+  name: String
+  type: String
+  updatedAt: DateTime
+}
+
+type Mutation {
+  ping: String
+}
+
+enum ParticipantStatus {
+  attended
+  cancelled
+  no_show
+  registered
+}
+
+type Query {
+  event(id: ID!): Event
+  eventSeries(active: Boolean = true): [EventSeries!]
+  events(limit: Int = 50, offset: Int = 0): [Event!]
+  facilitators(active: Boolean = true, department: String): [Facilitator!]
+  health: HealthCheck
+  hobbies(active: Boolean = true, category: String): [Hobby!]
+  levelsOfCare(active: Boolean = true): [LevelOfCare!]
+  locations(active: Boolean = true, type: String): [Location!]
+  tags(active: Boolean = true): [Tag!]
+  timestamp: String
+  version: String
+  wellnessDimensions(active: Boolean = true): [WellnessDimension!]
+}
+
+type RecurrencePattern {
+  createdAt: DateTime
+  dayOfMonth: Int
+  daysOfWeek: [Int!]
+  endDate: DateTime
+  id: ID
+  interval: Int
+  monthOfYear: Int
+  occurrences: Int
+  type: String
+  weekOfMonth: Int
+}
+
+enum RecurrenceType {
+  daily
+  monthly
+  weekly
+  yearly
+}
+
+enum SortDirection {
+  asc
+  desc
+}
+
+type Tag {
+  color: String
+  createdAt: DateTime
+  id: ID
+  isActive: Boolean
+  name: String
+  updatedAt: DateTime
+}
+
+type User {
+  createdAt: DateTime
+  email: String
+  id: ID
+  name: String
+  updatedAt: DateTime
+}
+
+type WellnessDimension {
+  color: String
+  createdAt: DateTime
+  description: String
+  id: ID
+  isActive: Boolean
+  name: String
+}
