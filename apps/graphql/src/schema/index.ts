@@ -292,14 +292,14 @@ const EventType = builder.objectRef<Event>('Event').implement({
     maxParticipants: t.exposeInt('maxParticipants', { nullable: true }),
     currentParticipants: t.int({ 
       resolve: async (obj, _, ctx) => {
-        // Count participants with 'registered' status
+        // Count participants with 'registered' or 'attended' status
         const result = await ctx.db
           .select({ count: count() })
           .from(dbSchema.eventParticipants)
           .where(
             and(
               eq(dbSchema.eventParticipants.eventId, obj.id),
-              inArray(dbSchema.eventParticipants.status, ['registered'])
+              inArray(dbSchema.eventParticipants.status, ['registered','attended'])
             )
           );
         

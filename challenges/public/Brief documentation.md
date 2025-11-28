@@ -15,6 +15,8 @@ To enforce `Users can only cancel their own registrations`, we use ctx.user to f
 
    - Note any trade-offs or assumptions you made
 
+If I was submitting this work as a PR, I'd clean up my commit history with a rebase. However, since this is an exercise, I thought you might want to see my process (however messy).
+
 If I'd had more time, I would have liked to:
 - handle concurrent updates on the server
 - use the status from `eventParticipant` rather than hardcoding on the frontend (I took a crack at it in bdd7ab16a8e367959d3f8e1917ce7d7f596079db but stopped to better respect the timebox)
