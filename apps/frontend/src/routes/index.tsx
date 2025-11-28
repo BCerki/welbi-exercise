@@ -165,20 +165,7 @@ function HomePage() {
         }
       })
       
-      queryClient.setQueryData(['calendar-events'], (old: typeof calendarEventsData) => {
-        if (!old?.events) return old
-        return {
-          ...old,
-          events: old.events.map((event) => 
-            event.id === eventId
-              ? {
-                  ...event,
-                  currentParticipants: Math.max(0, (event.currentParticipants || 0) - 1),
-                }
-              : event
-          ),
-        }
-      })
+     
     })
   }, [registerMutations, cancelMutations, queryClient])
 
