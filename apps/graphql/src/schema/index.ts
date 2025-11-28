@@ -19,7 +19,7 @@ type Event = typeof dbSchema.events.$inferSelect;
 type EventRegistrationResult = {
   userId: string;
   eventId: string;
-  currentParticipants?: number;
+  currentParticipants: number;
 };
 
 // Event status enum values
@@ -246,8 +246,7 @@ const EventRegistrationResultType = builder.objectRef<EventRegistrationResult>('
     userId: t.exposeID('userId'),
     eventId: t.exposeID('eventId'),
     currentParticipants: t.int({
-      nullable: true,
-      resolve: (obj) => obj.currentParticipants,
+      resolve: (obj) => obj.currentParticipants ?? 0,
     }),
   }),
 });
