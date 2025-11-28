@@ -68,13 +68,6 @@ function EventDetailPage() {
     queryFn: () => execute(EventDetailQuery, { id: eventId }),
   })
 
-
-  
-  // isLoading should be there: https://tanstack.com/query/v4/docs/framework/react/reference/useMutation
-  // const { data: bri, isLoading: cancellationIsLoading, error: cancellationError, isSuccess: cancellationSuccess } 
-  
-  
- 
   const registerMutation = useMutation({
     mutationKey: ['event', eventId],
     mutationFn: () => execute(RegisterForEventMutation, { eventId: eventId }),
