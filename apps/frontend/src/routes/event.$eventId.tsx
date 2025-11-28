@@ -69,9 +69,40 @@ function EventDetailPage() {
   const cancelMutation = useMutation({
     mutationKey: ['event', eventId],
     mutationFn: () => execute(CancelEventRegistrationMutation, { eventId: eventId }),
-    onMutate: ()=> console.log("optimistic update"),
+    onMutate: async () => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: ['event', eventId] })
+
+      // Snapshot the previous value
+      const previousEventData = queryClient.getQueryData(['event', eventId])
+
+      // Optimistically update the cache
+      queryClient.setQueryData(['event', eventId], (old: typeof eventData) => {
+        if (!old?.event) return old
+        return {
+          ...old,
+          event: {
+            ...old.event,
+            currentUserIsRegistered: false,
+            currentParticipants: Math.max(0, (old.event.currentParticipants || 0) - 1),
+            availableSpots: old.event.maxParticipants 
+              ? (old.event.availableSpots || 0) + 1 
+              : old.event.availableSpots,
+          },
+        }
+      })
+
+      // Return context with the previous value for rollback
+      return { previousEventData }
+    },
+    onError: (err, variables, context) => {
+      // Rollback to the previous value on error
+      if (context?.previousEventData) {
+        queryClient.setQueryData(['event', eventId], context.previousEventData)
+      }
+    },
     onSuccess: () => {
-      // Invalidate and refetch the event query to update registration status
+      // Invalidate and refetch to ensure consistency with server
       queryClient.invalidateQueries({ queryKey: ['event', eventId] })
     },
     // handle concurrent updates
@@ -82,9 +113,40 @@ function EventDetailPage() {
   const registerMutation = useMutation({
     mutationKey: ['event', eventId],
     mutationFn: () => execute(RegisterForEventMutation, { eventId: eventId }),
-    onMutate: ()=> console.log("optimistic update"),
+    onMutate: async () => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: ['event', eventId] })
+
+      // Snapshot the previous value
+      const previousEventData = queryClient.getQueryData(['event', eventId])
+
+      // Optimistically update the cache
+      queryClient.setQueryData(['event', eventId], (old: typeof eventData) => {
+        if (!old?.event) return old
+        return {
+          ...old,
+          event: {
+            ...old.event,
+            currentUserIsRegistered: true,
+            currentParticipants: (old.event.currentParticipants || 0) + 1,
+            availableSpots: old.event.maxParticipants 
+              ? Math.max(0, (old.event.availableSpots || 0) - 1)
+              : old.event.availableSpots,
+          },
+        }
+      })
+
+      // Return context with the previous value for rollback
+      return { previousEventData }
+    },
+    onError: (err, variables, context) => {
+      // Rollback to the previous value on error
+      if (context?.previousEventData) {
+        queryClient.setQueryData(['event', eventId], context.previousEventData)
+      }
+    },
     onSuccess: () => {
-      // Invalidate and refetch the event query to update registration status
+      // Invalidate and refetch to ensure consistency with server
       queryClient.invalidateQueries({ queryKey: ['event', eventId] })
     },
     // handle concurrent updates
