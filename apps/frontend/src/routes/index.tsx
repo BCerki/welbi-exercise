@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { Card, Box, Typography, CardContent, Calendar, Grid, GridItem } from '@testwelbi/ui'
+import { useQuery, useQueryClient, useMutationState } from '@tanstack/react-query'
+import { Card, Box, Typography, CardContent, Calendar, Grid, GridItem, StatusBadge } from '@testwelbi/ui'
 import type { CalendarEvent } from '@testwelbi/ui'
 import { graphql } from '../graphql'
 import { execute } from '../graphql/execute'
@@ -13,7 +13,7 @@ type SearchParams = {
 }
 
 // Type-safe GraphQL queries using generated client
-const HealthQuery = graphql(`
+export const HealthQuery = graphql(`
   query Health {
     health {
       status
@@ -38,6 +38,7 @@ const EventsQuery = graphql(`
       maxParticipants
       registrationRequired
       status
+      currentUserIsRegistered
     }
   }
 `)
@@ -60,6 +61,7 @@ const CalendarEventsQuery = graphql(`
 function HomePage() {
   const search = Route.useSearch() as SearchParams
   const navigate = Route.useNavigate()
+  const queryClient = useQueryClient()
   
   // Create initial date from URL params or default to current date
   const initialDate = React.useMemo(() => {
@@ -84,6 +86,88 @@ function HomePage() {
     queryKey: ['calendar-events'],
     queryFn: () => execute(CalendarEventsQuery, { limit: 3000 }),
   })
+
+  // // Listen for register mutations using useMutationState
+  // const registerMutations = useMutationState<string | null>({
+  //   filters: { 
+  //     status: 'pending',
+  //   },
+  //   select: (mutation) => {
+  //     const mutationKey = mutation.options.mutationKey
+  //     const mutationFnString = mutation.options.mutationFn?.toString() || ''
+  //     const isRegister = mutationFnString.includes('registerForEvent')
+      
+  //     if (Array.isArray(mutationKey) && mutationKey[0] === 'event' && mutationKey[1] && isRegister) {
+  //       return mutationKey[1] as string // Return eventId directly
+  //     }
+  //     return null
+  //   },
+  // })
+
+  // // Listen for cancel mutations using useMutationState
+  // const cancelMutations = useMutationState<string | null>({
+  //   filters: { 
+  //     status: 'pending',
+  //   },
+  //   select: (mutation) => {
+  //     const mutationKey = mutation.options.mutationKey
+  //     const mutationFnString = mutation.options.mutationFn?.toString() || ''
+  //     const isCancel = mutationFnString.includes('cancelEventRegistration')
+      
+  //     if (Array.isArray(mutationKey) && mutationKey[0] === 'event' && mutationKey[1] && isCancel) {
+  //       return mutationKey[1] as string // Return eventId directly
+  //     }
+  //     return null
+  //   },
+  // })
+
+  // Optimistically update queries when mutations are pending
+  // React.useEffect(() => {
+  //   // Handle register mutations
+  //   registerMutations.forEach((eventId) => {
+  //     if (!eventId) return
+      
+  //     queryClient.setQueryData(['events'], (old: typeof eventsData) => {
+  //       if (!old?.events) return old
+  //       return {
+  //         ...old,
+  //         events: old.events.map((event) => 
+  //           event.id === eventId
+  //             ? {
+  //                 ...event,
+  //                 currentUserIsRegistered: true,
+  //                 currentParticipants: (event.currentParticipants || 0) + 1,
+  //               }
+  //             : event
+  //         ),
+  //       }
+  //     })
+    
+  //   })
+
+  //   // Handle cancel mutations
+  //   cancelMutations.forEach((eventId) => {
+  //     if (!eventId) return
+      
+  //     queryClient.setQueryData(['events'], (old: typeof eventsData) => {
+  //       if (!old?.events) return old
+  //       return {
+  //         ...old,
+  //         events: old.events.map((event) => 
+  //           event.id === eventId
+  //             ? {
+  //                 ...event,
+  //                 currentUserIsRegistered: false,
+  //                 currentParticipants: Math.max(0, (event.currentParticipants || 0) - 1),
+  //               }
+  //             : event
+  //         ),
+  //       }
+  //     })
+      
+     
+  //   })
+  // }, [registerMutations, cancelMutations, queryClient])
 
   // Debug logging for raw data
   React.useEffect(() => {
@@ -350,11 +434,18 @@ function HomePage() {
                       <Typography $variant="body2">
                         Status: {event.status}
                       </Typography>
+                      {healthData?.health?.currentUser && event.registrationRequired && (
+                      <Typography $variant="body2">
+                                    Registration status: {event.currentUserIsRegistered ? 'Registered' : 'Not Registered'}
+                                  </Typography>)}
+                      
                       {event.currentParticipants !== null && (
                         <Typography $variant="body2">
                           Participants: {event.currentParticipants}{event.maxParticipants && `/${event.maxParticipants}`}
                         </Typography>
+                        
                       )}
+                      
                     </Box>
                   ))}
                 </Box>

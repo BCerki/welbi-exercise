@@ -5,6 +5,8 @@ type Event {
   availableSpots: Int
   createdAt: DateTime
   currentParticipants: Int
+  currentUser: User
+  currentUserIsRegistered: Boolean
   description: String
   duration: Int
   endTime: DateTime
@@ -32,6 +34,12 @@ input EventFiltersInput {
   status: [EventStatus!]
   tagIds: [String!]
   wellnessDimensionIds: [String!]
+}
+
+type EventRegistrationResult {
+  currentParticipants: Int
+  eventId: ID
+  userId: ID
 }
 
 type EventSeries {
@@ -116,7 +124,9 @@ type Location {
 }
 
 type Mutation {
+  cancelEventRegistration(eventId: ID!): EventRegistrationResult
   ping: String
+  registerForEvent(eventId: ID!): EventRegistrationResult
 }
 
 enum ParticipantStatus {

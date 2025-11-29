@@ -15,6 +15,7 @@
     "DateTime": "DateTime",
     "Event": "Event",
     "EventFiltersInput": "EventFiltersInput",
+    "EventRegistrationResult": "EventRegistrationResult",
     "EventSeries": "EventSeries",
     "EventSortField": "EventSortField",
     "EventSortInput": "EventSortInput",

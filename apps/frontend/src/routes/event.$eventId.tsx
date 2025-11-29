@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { 
   Card, Box, Typography, CardContent, Grid, GridItem,
   StatusBadge, InfoBox, ProgressBar, ProgressBarFill, ActionButton, 
@@ -26,20 +27,141 @@ const EventDetailQuery = graphql(`
       registrationDeadline
       status
       notes
+      currentUser {
+        id
+        name
+        email
+      }
+      currentUserIsRegistered
       createdAt
       updatedAt
     }
   }
 `)
 
+const CancelEventRegistrationMutation = graphql(`
+  mutation cancelEventRegistration($eventId: ID!) { 
+  cancelEventRegistration(eventId: $eventId) {
+    eventId
+    userId
+  }
+}`)
+
+const RegisterForEventMutation = graphql(`
+  mutation registerForEvent($eventId: ID!) { 
+  registerForEvent(eventId: $eventId) {
+    eventId
+    userId
+  }
+}`)
+
 function EventDetailPage() {
   const { eventId } = Route.useParams()
+  // Prep queryClient for use in optimistic updates
+  const queryClient = useQueryClient()
+
+  const [registerSuccess, setRegisterSuccess] = useState(false)
+  const [cancelSuccess, setCancelSuccess] = useState(false)
+
   
   const { data: eventData, isLoading, error } = useQuery({
     queryKey: ['event', eventId],
     queryFn: () => execute(EventDetailQuery, { id: eventId }),
   })
 
+  console.log('eventData',eventData)
+  const registerMutation = useMutation({
+    mutationKey: ['event', eventId],
+    mutationFn: () => execute(RegisterForEventMutation, { eventId: eventId }),
+    retry: false,
+    scope: {
+      id: `registration-${eventId}`, // Prevent concurrent Prevent concurrent registrations/cancellations for this event
+    },
+    onMutate: async () => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: ['event', eventId] })
+
+      // Snapshot the previous value
+      const previousEventData = queryClient.getQueryData(['event', eventId])
+
+      // Optimistically update the cache
+      queryClient.setQueryData(['event', eventId], (old: typeof eventData) => {
+        if (!old?.event) return old
+        return {
+          ...old,
+          event: {
+            ...old.event,
+            currentUserIsRegistered: true,
+            currentParticipants: (old.event.currentParticipants || 0) + 1,
+            availableSpots: Math.max(0,(old.event.availableSpots || 0) - 1)
+          },
+        }
+      })
+
+      // Return context with the previous value for rollback
+      return { previousEventData }
+    },
+    onError: (_err, _variables, context) => {
+      // Rollback to the previous value on error
+      if (context?.previousEventData) {
+        queryClient.setQueryData(['event', eventId], context.previousEventData)
+      }
+    },
+    onSuccess: () => {
+      setRegisterSuccess(true)
+      // Clear success message after 3 seconds
+      setTimeout(() => setRegisterSuccess(false), 3000)
+      // Invalidate and refetch to ensure consistency with server
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+    },
+  })
+
+ const cancelMutation = useMutation({
+    mutationKey: ['event', eventId],
+    mutationFn: () => execute(CancelEventRegistrationMutation, { eventId: eventId }),
+    retry: false,
+    scope: {
+      id: `registration-${eventId}`, // Prevent concurrent registrations/cancellations for this event
+    },
+    onMutate: async () => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: ['event', eventId] })
+
+      // Snapshot the previous value
+      const previousEventData = queryClient.getQueryData(['event', eventId])
+
+      // Optimistically update the cache
+      queryClient.setQueryData(['event', eventId], (old: typeof eventData) => {
+        if (!old?.event) return old
+        return {
+          ...old,
+          event: {
+            ...old.event,
+            currentUserIsRegistered: false,
+            currentParticipants: Math.max(0, (old.event.currentParticipants || 0) - 1),
+            availableSpots:  (old.event.availableSpots || 0) + 1 
+           ,
+          },
+        }
+      })
+
+      // Return context with the previous value for rollback
+      return { previousEventData }
+    },
+    onError: (_err, _variables, context) => {
+      // Rollback to the previous value on error
+      if (context?.previousEventData) {
+        queryClient.setQueryData(['event', eventId], context.previousEventData)
+      }
+    },
+    onSuccess: () => {
+      setCancelSuccess(true)
+      // Clear success message after 3 seconds
+      setTimeout(() => setCancelSuccess(false), 3000)
+      // Invalidate and refetch to ensure consistency with server
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+    },
+  })
   if (isLoading) {
     return (
       <PageContainer>
@@ -90,6 +212,46 @@ function EventDetailPage() {
       default: return status
     }
   }
+
+const handleRegister = () => {
+  // Clear any previous errors and success messages when retrying
+  registerMutation.reset()
+  setRegisterSuccess(false)
+  registerMutation.mutate()
+}
+
+const handleCancel = () => {
+  // Clear any previous errors and success messages when retrying
+  cancelMutation.reset()
+  setCancelSuccess(false)
+  cancelMutation.mutate()
+}
+
+const currentUser = eventData?.event?.currentUser
+const currentUserIsRegistered = eventData?.event?.currentUserIsRegistered || false
+const isLoggedIn = !!currentUser
+
+const { isPending: registrationLoading, error: registrationError } = registerMutation
+const { isPending: cancellationLoading, error: cancellationError } = cancelMutation
+
+const loadingMessage = "Loading..."
+
+const registrationButton = registrationLoading ? loadingMessage : <ActionButton 
+              $size="small" 
+              $variant="secondary"
+              onClick={handleRegister}
+              disabled={event.availableSpots && event.availableSpots < 1 || currentUserIsRegistered }
+            >
+              Register
+            </ActionButton>
+
+const cancellationButton = cancellationLoading ? loadingMessage : <ActionButton 
+              $size="small" 
+              $variant="danger"
+              onClick={handleCancel}
+            >
+              Cancel Registration
+            </ActionButton>
 
   return (
     <PageContainer>
@@ -249,7 +411,39 @@ function EventDetailPage() {
                   No capacity limit
                 </Typography>
               )}
-
+              <Spacer $size="sm" />
+{event.registrationRequired && (
+            <>
+            <Spacer $size="sm" />
+            {isLoggedIn ? (
+              <>
+                Your registration status is: {currentUserIsRegistered ? 'Registered' : 'Not registered'}
+                <Spacer $size="sm" />
+                {currentUserIsRegistered ? cancellationButton : registrationButton }
+              </>
+            ) : (
+              <Typography $variant="body2" $color="muted">
+                Please log in to register for this event
+              </Typography>
+            )}
+            <Spacer $size="sm" />
+            {registerSuccess && (
+              <Typography $variant="body2" $color="success">
+                ✅ Successfully registered for this event!
+              </Typography>
+            )}
+            {cancelSuccess && (
+              <Typography $variant="body2" $color="success">
+                ✅ Successfully cancelled your registration!
+              </Typography>
+            )}
+            {(registrationError || cancellationError) && (
+              <Typography $variant="body2" $color="error">
+                {registrationError?.message || cancellationError?.message}
+              </Typography>
+            )}
+            </>
+          )}
               {event.registrationDeadline && (
                 <>
                   <Spacer $size="md" />

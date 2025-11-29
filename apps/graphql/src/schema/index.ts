@@ -15,6 +15,13 @@ type EventSeries = typeof dbSchema.eventSeries.$inferSelect;
 type RecurrencePattern = typeof dbSchema.recurrencePatterns.$inferSelect;
 type Event = typeof dbSchema.events.$inferSelect;
 
+// Result types
+type EventRegistrationResult = {
+  userId: string;
+  eventId: string;
+  currentParticipants: number;
+};
+
 // Event status enum values
 type EventStatus = 'scheduled' | 'cancelled' | 'completed';
 type RecurrenceType = 'daily' | 'weekly' | 'monthly' | 'yearly';
@@ -234,6 +241,16 @@ const EventSeriesType = builder.objectRef<EventSeries>('EventSeries').implement(
   }),
 });
 
+const EventRegistrationResultType = builder.objectRef<EventRegistrationResult>('EventRegistrationResult').implement({
+  fields: (t) => ({
+    userId: t.exposeID('userId'),
+    eventId: t.exposeID('eventId'),
+    currentParticipants: t.int({
+      resolve: (obj) => obj.currentParticipants ?? 0,
+    }),
+  }),
+});
+
 const RecurrencePatternType = builder.objectRef<RecurrencePattern>('RecurrencePattern').implement({
   fields: (t) => ({
     id: t.exposeID('id'),
@@ -316,6 +333,30 @@ const EventType = builder.objectRef<Event>('Event').implement({
     }),
     status: t.exposeString('status'),
     notes: t.exposeString('notes', { nullable: true }),
+    currentUser: t.field({
+      type: UserType,
+      nullable: true,
+      resolve: (obj, _, ctx) => ctx.user || null,
+    }),
+    currentUserIsRegistered: t.boolean({
+      resolve: async (obj, _, ctx) => {
+        if (!ctx.user) return false;
+        
+        const result = await ctx.db
+          .select()
+          .from(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, obj.id),
+              eq(dbSchema.eventParticipants.userId, ctx.user.id),
+              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+            )
+          )
+          .limit(1);
+        
+        return result.length > 0;
+      }
+    }),
     createdAt: t.field({ 
       type: 'DateTime', 
       resolve: (obj) => timestampToDate(obj.createdAt)?.toISOString() || new Date().toISOString()
@@ -609,8 +650,163 @@ builder.mutationType({
     ping: t.string({
       resolve: () => 'pong',
     }),
+    registerForEvent: t.field({
+      type: EventRegistrationResultType,
+      args: {
+        eventId: t.arg.id({ required: true }),
+      },
+      resolve: async (_, args, ctx) => {
+        const eventId = parseInt(args.eventId);
+        
+        // Get user from context (authenticated user)
+        const userId = ctx.user?.id;
+        if (!userId) {
+          throw new Error('You must log in before registering');
+        }
+        
+        // Check if user is already registered
+        const existingRegistration = await ctx.db
+          .select()
+          .from(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, eventId),
+              eq(dbSchema.eventParticipants.userId, userId),
+              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+            )
+          )
+          .limit(1);
+        
+        if (existingRegistration.length > 0) {
+          throw new Error('You are already registered for this event');
+        }
+        
+        // Check capacity
+        const event = await ctx.db
+          .select()
+          .from(dbSchema.events)
+          .where(eq(dbSchema.events.id, eventId))
+          .limit(1);
+        
+        if (event.length === 0) {
+          throw new Error('Event not found');
+        }
+        
+        const eventData = event[0];
+
+        if (eventData.maxParticipants !== null && eventData.maxParticipants !== undefined) {
+          const participantCount = await ctx.db
+            .select({ count: count() })
+            .from(dbSchema.eventParticipants)
+            .where(
+              and(
+                eq(dbSchema.eventParticipants.eventId, eventId),
+                inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+              )
+            );
+          
+          const currentParticipants = participantCount[0]?.count || 0;
+          
+          if (currentParticipants >= eventData.maxParticipants) {
+            throw new Error('Event is at full capacity');
+          }
+        }
+        
+        // Insert into eventParticipants table
+        const result = await ctx.db
+          .insert(dbSchema.eventParticipants)
+          .values({
+            eventId: eventId,
+            userId: userId,
+            status: 'registered',
+            registeredAt: Date.now() / 1000, // Unix timestamp
+          })
+          .returning();
+        
+        // Count participants AFTER the insert to get updated currentParticipants
+        const participantCount = await ctx.db
+          .select({ count: count() })
+          .from(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, eventId),
+              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+            )
+          );
+        
+        const currentParticipants = participantCount[0]?.count || 0;
+        
+        return {
+          userId: userId.toString(),
+          eventId: eventId.toString(),
+          currentParticipants: currentParticipants,
+        };
+      },
+    }),
+    cancelEventRegistration: t.field({
+      type: EventRegistrationResultType,
+      args: {
+        eventId: t.arg.id({ required: true }),
+      },
+      resolve: async (_, args, ctx) => {
+        const eventId = parseInt(args.eventId);
+        
+        // Get user from context (authenticated user)
+        const userId = ctx.user?.id;
+        if (!userId) {
+          throw new Error('You must log in before registering');
+        }
+
+        // Users can only cancel their own registrations
+        const registration = await ctx.db
+          .select()
+          .from(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, eventId),
+              eq(dbSchema.eventParticipants.userId, userId),
+              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+            )
+          )
+          .limit(1);
+
+        if (!registration.length) {
+          throw new Error('Registration not found. You can only cancel your own registrations.');
+        }
+
+        // Delete the registration - userId filter ensures users can only delete their own
+        await ctx.db
+          .delete(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, eventId),
+              eq(dbSchema.eventParticipants.userId, userId) // Only delete registrations belonging to the authenticated user
+            )
+          );
+
+        // Count participants AFTER the delete to get updated currentParticipants
+        const participantCount = await ctx.db
+          .select({ count: count() })
+          .from(dbSchema.eventParticipants)
+          .where(
+            and(
+              eq(dbSchema.eventParticipants.eventId, eventId),
+              inArray(dbSchema.eventParticipants.status, ['registered', 'attended'])
+            )
+          );
+        
+        const currentParticipants = participantCount[0]?.count || 0;
+
+        return {
+          userId: userId.toString(),
+          eventId: eventId.toString(),
+          currentParticipants: currentParticipants,
+        };
+      },
+    }),
   }),
 });
+
 
 // Build and export schema
 export function createSchema() {

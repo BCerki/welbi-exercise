@@ -35,7 +35,7 @@ export async function execute<TResult, TVariables>(
   
   // Handle GraphQL errors
   if (result.errors) {
-    throw new Error(`GraphQL Error: ${result.errors.map((e: any) => e.message).join(', ')}`)
+    throw new Error(result.errors.map((e: any) => e.message).join(', '))
   }
   
   // Return just the data portion

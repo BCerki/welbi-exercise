@@ -23,6 +23,8 @@ export type Event = {
   availableSpots?: Maybe<Scalars['Int']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   currentParticipants?: Maybe<Scalars['Int']['output']>;
+  currentUser?: Maybe<User>;
+  currentUserIsRegistered?: Maybe<Scalars['Boolean']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   duration?: Maybe<Scalars['Int']['output']>;
   endTime?: Maybe<Scalars['DateTime']['output']>;
@@ -50,6 +52,13 @@ export type EventFiltersInput = {
   status?: InputMaybe<Array<EventStatus>>;
   tagIds?: InputMaybe<Array<Scalars['String']['input']>>;
   wellnessDimensionIds?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type EventRegistrationResult = {
+  __typename?: 'EventRegistrationResult';
+  currentParticipants?: Maybe<Scalars['Int']['output']>;
+  eventId?: Maybe<Scalars['ID']['output']>;
+  userId?: Maybe<Scalars['ID']['output']>;
 };
 
 export type EventSeries = {
@@ -141,7 +150,19 @@ export type Location = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  cancelEventRegistration?: Maybe<EventRegistrationResult>;
   ping?: Maybe<Scalars['String']['output']>;
+  registerForEvent?: Maybe<EventRegistrationResult>;
+};
+
+
+export type MutationCancelEventRegistrationArgs = {
+  eventId: Scalars['ID']['input'];
+};
+
+
+export type MutationRegisterForEventArgs = {
+  eventId: Scalars['ID']['input'];
 };
 
 export enum ParticipantStatus {
@@ -276,7 +297,21 @@ export type EventDetailQueryVariables = Exact<{
 }>;
 
 
-export type EventDetailQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, duration?: number | null, allDay?: boolean | null, maxParticipants?: number | null, currentParticipants?: number | null, availableSpots?: number | null, registrationRequired?: boolean | null, registrationDeadline?: any | null, status?: string | null, notes?: string | null, createdAt?: any | null, updatedAt?: any | null } | null };
+export type EventDetailQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, duration?: number | null, allDay?: boolean | null, maxParticipants?: number | null, currentParticipants?: number | null, availableSpots?: number | null, registrationRequired?: boolean | null, registrationDeadline?: any | null, status?: string | null, notes?: string | null, currentUserIsRegistered?: boolean | null, createdAt?: any | null, updatedAt?: any | null, currentUser?: { __typename?: 'User', id?: string | null, name?: string | null, email?: string | null } | null } | null };
+
+export type CancelEventRegistrationMutationVariables = Exact<{
+  eventId: Scalars['ID']['input'];
+}>;
+
+
+export type CancelEventRegistrationMutation = { __typename?: 'Mutation', cancelEventRegistration?: { __typename?: 'EventRegistrationResult', eventId?: string | null, userId?: string | null } | null };
+
+export type RegisterForEventMutationVariables = Exact<{
+  eventId: Scalars['ID']['input'];
+}>;
+
+
+export type RegisterForEventMutation = { __typename?: 'Mutation', registerForEvent?: { __typename?: 'EventRegistrationResult', eventId?: string | null, userId?: string | null } | null };
 
 export type HealthQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -288,7 +323,7 @@ export type EventsQueryVariables = Exact<{
 }>;
 
 
-export type EventsQuery = { __typename?: 'Query', events?: Array<{ __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, currentParticipants?: number | null, maxParticipants?: number | null, registrationRequired?: boolean | null, status?: string | null }> | null };
+export type EventsQuery = { __typename?: 'Query', events?: Array<{ __typename?: 'Event', id?: string | null, title?: string | null, description?: string | null, startTime?: any | null, endTime?: any | null, currentParticipants?: number | null, maxParticipants?: number | null, registrationRequired?: boolean | null, status?: string | null, currentUserIsRegistered?: boolean | null }> | null };
 
 export type CalendarEventsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -333,11 +368,33 @@ export const EventDetailDocument = new TypedDocumentString(`
     registrationDeadline
     status
     notes
+    currentUser {
+      id
+      name
+      email
+    }
+    currentUserIsRegistered
     createdAt
     updatedAt
   }
 }
     `) as unknown as TypedDocumentString<EventDetailQuery, EventDetailQueryVariables>;
+export const CancelEventRegistrationDocument = new TypedDocumentString(`
+    mutation cancelEventRegistration($eventId: ID!) {
+  cancelEventRegistration(eventId: $eventId) {
+    eventId
+    userId
+  }
+}
+    `) as unknown as TypedDocumentString<CancelEventRegistrationMutation, CancelEventRegistrationMutationVariables>;
+export const RegisterForEventDocument = new TypedDocumentString(`
+    mutation registerForEvent($eventId: ID!) {
+  registerForEvent(eventId: $eventId) {
+    eventId
+    userId
+  }
+}
+    `) as unknown as TypedDocumentString<RegisterForEventMutation, RegisterForEventMutationVariables>;
 export const HealthDocument = new TypedDocumentString(`
     query Health {
   health {
@@ -362,6 +419,7 @@ export const EventsDocument = new TypedDocumentString(`
     maxParticipants
     registrationRequired
     status
+    currentUserIsRegistered
   }
 }
     `) as unknown as TypedDocumentString<EventsQuery, EventsQueryVariables>;
